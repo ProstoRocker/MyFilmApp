@@ -8,10 +8,11 @@
     <!-- Верхнее меню -->
     <FrameLayout
         android:id="@+id/top_menu"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
         android:background="#4CAF50"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
+        app:layout_constraintHorizontal_weight="3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -22,16 +23,16 @@
             android:layout_marginStart="16dp"
             android:text="FilmsSearch"
             android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </FrameLayout>
 
-    <!-- Горизонтальный список постеров -->
+    <!-- Горизонтальный список постеров (увеличенная высота) -->
     <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
         android:layout_marginTop="8dp"
         android:scrollbars="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_menu">
 
@@ -42,24 +43,24 @@
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="150dp"
+                android:layout_width="140dp"
+                android:layout_height="180dp"
                 android:layout_marginEnd="8dp"
                 android:contentDescription="Постер 1"
                 android:scaleType="centerCrop"
                 android:src="@drawable/poster_1" />
 
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="150dp"
+                android:layout_width="140dp"
+                android:layout_height="180dp"
                 android:layout_marginEnd="8dp"
                 android:contentDescription="Постер 2"
                 android:scaleType="centerCrop"
                 android:src="@drawable/poster_2" />
 
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="150dp"
+                android:layout_width="140dp"
+                android:layout_height="180dp"
                 android:layout_marginEnd="8dp"
                 android:contentDescription="Постер 3"
                 android:scaleType="centerCrop"
@@ -67,47 +68,82 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Текст под постерами -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:text="Постеры предоставлены: https://www.movieposters.com/"
-        android:textColor="#666666"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_menu" />
+    <!-- Боковая панель (была нижней) -->
+    <FrameLayout
+        android:id="@+id/side_panel"
+        android:layout_width="120dp"
+        android:layout_height="0dp"
+        android:background="#00BCD4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Guideline: начало карточки (30% экрана) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_top_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-    <!-- Guideline: конец карточки (70% экрана) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_bottom_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="МЕНЮ"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
 
-    <!-- Центральная градиентная карточка -->
+            <Button
+                android:id="@+id/btn_side_collections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Подборки"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_side_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Избранное"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_side_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Настройки"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Центральная градиентная карточка (уже и выше) -->
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/card_margin_horizontal"
-        android:layout_marginEnd="@dimen/card_margin_horizontal"
-        android:padding="@dimen/card_padding_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_card"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_top_card">
+        app:layout_constraintTop_toBottomOf="@id/top_menu">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -117,71 +153,52 @@
             android:orientation="vertical"
             android:paddingVertical="16dp">
 
-            <!-- Кнопки меню -->
             <Button
-                android:id="@+id/btn_menu"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="МЕНЮ"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/btn_favorites"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="ИЗБРАННОЕ"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/btn_later"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="ПОСМОТРЕТЬ ПОЗЖЕ"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/btn_collections"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="ПОДБОРКИ"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/btn_settings"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="НАСТРОЙКИ"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
-    <!-- Нижняя панель -->
-    <FrameLayout
-        android:id="@+id/bottom_container"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="#00BCD4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-
-    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

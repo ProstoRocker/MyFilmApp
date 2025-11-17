@@ -148,55 +148,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:background="@drawable/gradient_menu"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="16dp">
+            android:padding="16dp">
 
-            <Button
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
+            <!-- Приветствие -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="МЕНЮ"
+                android:text="Добро пожаловать!"
+                android:textSize="20sp"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
 
-            <Button
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ИЗБРАННОЕ"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-            <Button
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ПОСМОТРЕТЬ ПОЗЖЕ"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-            <Button
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ПОДБОРКИ"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-            <Button
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="НАСТРОЙКИ"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:text="Выберите раздел внизу, чтобы начать."
+                android:textSize="14sp"
+                android:textColor="#EEEEEE"
+                android:gravity="center" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -6,24 +6,17 @@
     android:layout_height="match_parent">
 
     <!-- Верхнее меню -->
-    <FrameLayout
-        android:id="@+id/top_menu"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="#4CAF50"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
-            android:text="FilmsSearch"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_menu"
+        app:title="FilmsSearch"
+        app:titleTextColor="#FFFFFF" />
 
     <!-- Горизонтальный список постеров -->
     <HorizontalScrollView
@@ -33,7 +26,7 @@
         android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_menu">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -77,7 +70,7 @@
         android:textColor="#666666"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_menu" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <!-- Guideline: начало карточки (30% экрана) -->
     <androidx.constraintlayout.widget.Guideline
@@ -115,73 +108,87 @@
             android:background="@drawable/gradient_menu"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="16dp">
+            android:padding="16dp">
 
-            <!-- Кнопки меню -->
-            <Button
-                android:id="@+id/btn_menu"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
+            <!-- Приветствие -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="МЕНЮ"
+                android:layout_marginBottom="16dp"
+                android:text="Добро пожаловать!"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btn_favorites"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ИЗБРАННОЕ"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/btn_later"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ПОСМОТРЕТЬ ПОЗЖЕ"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/btn_collections"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="ПОДБОРКИ"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/btn_settings"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="НАСТРОЙКИ"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
+                android:gravity="center"
+                android:text="Выберите раздел внизу, чтобы начать."
+                android:textColor="#EEEEEE"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Нижняя панель -->
-    <FrameLayout
-        android:id="@+id/bottom_container"
+    <!-- Нижняя панель навигации -->
+    <LinearLayout
+        android:id="@+id/bottom_navigation_simple"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:background="#00BCD4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- Кнопка "Главная" -->
+        <ImageButton
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Главная"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_home" />
 
-    </FrameLayout>
+        <!-- Кнопка "Избранное" -->
+        <ImageButton
+            android:id="@+id/nav_favorites"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Избранное"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_favorite" />
 
+        <!-- Кнопка "Подборки" -->
+        <ImageButton
+            android:id="@+id/nav_collections"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Подборки"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_collections" />
+
+        <!-- Кнопка "Настройки" -->
+        <ImageButton
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Настройки"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_settings" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

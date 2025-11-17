@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.ProjectDreams" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Основной цвет -->
+        <item name="colorPrimary">#00C853</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <!-- Фон приложения -->
+        <item name="android:windowBackground">#121212</item>
+
+        <!-- Цвет карточек, панелей -->
+        <item name="colorSurface">#1F1F1F</item>
+
+        <!-- Текст -->
+        <item name="android:textColorPrimary">#E0E0E0</item>
+        <item name="android:textColorSecondary">#B0B0B0</item>
+
+        <!-- Акцентные элементы -->
+        <item name="colorSecondary">#00BCD4</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+    </style>
+</resources>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Верхнее меню -->
+    <FrameLayout
+        android:id="@+id/top_menu"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="#4CAF50"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
+        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="FilmsSearch"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+    </FrameLayout>
+
+    <!-- Горизонтальный список постеров (увеличенная высота) -->
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="8dp"
+        android:scrollbars="horizontal"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_menu">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="180dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Постер 1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster_1" />
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="180dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Постер 2"
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster_2" />
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="180dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Постер 3"
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster_3" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Боковая панель (была нижней) -->
+    <FrameLayout
+        android:id="@+id/side_panel"
+        android:layout_width="120dp"
+        android:layout_height="0dp"
+        android:background="#00BCD4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="МЕНЮ"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_side_collections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Подборки"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_side_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Избранное"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_side_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_rounded_white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:text="Настройки"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Центральная градиентная карточка (уже и выше) -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/side_panel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_menu">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/gradient_menu"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <!-- Приветствие -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Добро пожаловать!"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Выберите раздел внизу, чтобы начать."
+                android:textSize="14sp"
+                android:textColor="#EEEEEE"
+                android:gravity="center" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,17 +6,24 @@
     android:layout_height="match_parent">
 
     <!-- Верхнее меню -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <FrameLayout
+        android:id="@+id/top_menu"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:layout_height="80dp"
+        android:background="#4CAF50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_menu"
-        app:title="FilmsSearch"
-        app:titleTextColor="#FFFFFF" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="FilmsSearch"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+    </FrameLayout>
 
     <!-- Горизонтальный список постеров -->
     <HorizontalScrollView
@@ -26,7 +33,7 @@
         android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/top_menu">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -70,7 +77,7 @@
         android:textColor="#666666"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/top_menu" />
 
     <!-- Guideline: начало карточки (30% экрана) -->
     <androidx.constraintlayout.widget.Guideline
@@ -92,9 +99,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/card_margin_horizontal"
-        android:layout_marginEnd="@dimen/card_margin_horizontal"
-        android:padding="@dimen/card_padding_vertical"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@id/guideline_bottom_card"
@@ -105,90 +111,43 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:background="@drawable/gradient_menu"
             android:gravity="center"
-            android:orientation="vertical"
             android:padding="16dp">
 
             <!-- Приветствие -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
                 android:text="Добро пожаловать!"
-                android:textColor="#FFFFFF"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="Выберите раздел внизу, чтобы начать."
+                android:textSize="14sp"
                 android:textColor="#EEEEEE"
-                android:textSize="14sp" />
+                android:gravity="center" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Нижняя панель навигации -->
-    <LinearLayout
-        android:id="@+id/bottom_navigation_simple"
+    <!-- Нижняя панель -->
+    <FrameLayout
+        android:id="@+id/bottom_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:background="#00BCD4"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Кнопка "Главная" -->
-        <ImageButton
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Главная"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_home" />
 
-        <!-- Кнопка "Избранное" -->
-        <ImageButton
-            android:id="@+id/nav_favorites"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Избранное"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_favorite" />
+    </FrameLayout>
 
-        <!-- Кнопка "Подборки" -->
-        <ImageButton
-            android:id="@+id/nav_collections"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Подборки"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_collections" />
-
-        <!-- Кнопка "Настройки" -->
-        <ImageButton
-            android:id="@+id/nav_settings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Настройки"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_settings" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

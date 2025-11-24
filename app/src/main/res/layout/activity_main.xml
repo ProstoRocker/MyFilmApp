@@ -6,159 +6,96 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Верхнее меню -->
+    <!-- Верхний Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_menu"
         app:title="FilmsSearch"
-        app:titleTextColor="#FFFFFF" />
-
-    <!-- Горизонтальный список постеров -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_posters"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="8dp"
-        android:scrollbars="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:titleTextColor="#FFFFFF"
+        app:navigationIcon="@drawable/ic_menu"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Текст под постерами -->
+    <!-- Заголовок "Популярные фильмы" -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Популярные фильмы"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:text="Постеры предоставлены: https://www.movieposters.com/"
-        android:textColor="#666666"
-        android:textSize="12sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- RecyclerView с горизонтальным списком фильмов -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_movies"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-    <!-- Guideline: начало карточки (30% экрана) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_top_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
-
-    <!-- Guideline: конец карточки (70% экрана) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_bottom_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
-
-    <!-- Центральная градиентная карточка -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/card_margin_horizontal"
-        android:layout_marginEnd="@dimen/card_margin_horizontal"
-        android:padding="@dimen/card_padding_vertical"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_card"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_top_card">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradient_menu"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Приветствие -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Добро пожаловать!"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Выберите раздел внизу, чтобы начать."
-                android:textColor="#EEEEEE"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Нижняя панель навигации -->
     <LinearLayout
         android:id="@+id/bottom_navigation_simple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00BCD4"
-        android:gravity="center"
         android:orientation="horizontal"
+        android:background="#00BCD4"
         android:padding="8dp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Кнопка "Главная" -->
         <ImageButton
             android:id="@+id/nav_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:src="@drawable/ic_home"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Главная"
             android:padding="8dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_home" />
+            android:contentDescription="Главная" />
 
-        <!-- Кнопка "Избранное" -->
         <ImageButton
             android:id="@+id/nav_favorites"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:src="@drawable/ic_favorite"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Избранное"
             android:padding="8dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_favorite" />
+            android:contentDescription="Избранное" />
 
-        <!-- Кнопка "Подборки" -->
         <ImageButton
             android:id="@+id/nav_collections"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:src="@drawable/ic_collections"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Подборки"
             android:padding="8dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_collections" />
+            android:contentDescription="Подборки" />
 
-        <!-- Кнопка "Настройки" -->
         <ImageButton
             android:id="@+id/nav_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:src="@drawable/ic_settings"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Настройки"
             android:padding="8dp"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_settings" />
-
+            android:contentDescription="Настройки" />
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

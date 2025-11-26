@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ilyadev.moviesearch.databinding.ItemPosterBinding
 import android.view.animation.OvershootInterpolator
 
-class PosterAdapter(private val posters: List<Int>) : RecyclerView.Adapter<PosterAdapter.ViewHolder>() {
+class PosterAdapter(private val posters: List<Int>) :
+    RecyclerView.Adapter<PosterAdapter.ViewHolder>() {
 
     // Внутренний класс для хранения ссылок на View
     inner class ViewHolder(val binding: ItemPosterBinding) : RecyclerView.ViewHolder(binding.root)

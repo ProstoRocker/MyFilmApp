@@ -18,7 +18,8 @@ class MovieAdapter(
     /**
      * Вьюхолдер, хранящий ссылки на View одного элемента
      */
-    inner class MovieViewHolder(val binding: ItemMovieBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class MovieViewHolder(val binding: ItemMovieBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     /**
      * Создаёт новый ViewHolder из макета item_movie.xml

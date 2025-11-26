@@ -1,147 +1,76 @@
 package com.ilyadev.moviesearch
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ilyadev.moviesearch.ui.home.HomeFragment
+import com.ilyadev.moviesearch.ui.favorites.FavoritesFragment
+import com.ilyadev.moviesearch.ui.settings.SettingsFragment
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Настраиваем Toolbar
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        bottomNav = findViewById(R.id.bottom_navigation)
 
-        // 2. Инициализируем RecyclerView
-        val recycler = findViewById<RecyclerView>(R.id.recycler_movies)
-
-        // Создаём список фильмов
-        val movies = createMockMovies()
-
-        // Создаём адаптер с обработкой клика
-        val adapter = MovieAdapter { movie ->
-            // При клике на фильм — переходим в DetailActivity
-            val intent = Intent(this, DetailActivity::class.java)
-            intent.putExtra("movie_id", movie.id)
-            startActivity(intent)
+        // Загружаем HomeFragment при старте
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
         }
 
-        // Передаём данные в адаптер
-        adapter.submitList(movies)
+        // Обработка нажатий в нижней навигации
+        bottomNav.setOnItemSelectedListener { item ->
+            val fragment: Fragment = when (item.itemId) {
+                R.id.nav_home -> HomeFragment()
+                R.id.nav_favorites -> FavoritesFragment()
+                R.id.nav_settings -> SettingsFragment()
+                else -> return@setOnItemSelectedListener false
+            }
 
-        // Устанавливаем LayoutManager и Adapter
-        recycler.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        recycler.adapter = adapter
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit()
 
-        // 3. Нижняя панель навигации (ImageButton)
-        val navHome = findViewById<ImageButton>(R.id.nav_home)
-        val navFavorites = findViewById<ImageButton>(R.id.nav_favorites)
-        val navCollections = findViewById<ImageButton>(R.id.nav_collections)
-        val navSettings = findViewById<ImageButton>(R.id.nav_settings)
-
-        navHome.setOnClickListener {
-            Toast.makeText(this, "Главная", Toast.LENGTH_SHORT).show()
-        }
-
-        navFavorites.setOnClickListener {
-            Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
-        }
-
-        navCollections.setOnClickListener {
-            Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
-        }
-
-        navSettings.setOnClickListener {
-            Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
+            true
         }
     }
 
     /**
-     * Возвращает список тестовых фильмов (mock data)
+     * Переопределение кнопки "Назад"
+     * Если есть фрагменты в стеке — назад
+     * Если на главном экране — спрашиваем, хочет ли пользователь выйти
      */
-    private fun createMockMovies(): List<Movie> {
-        return listOf(
-            Movie(
-                id = 1,
-                title = "Матрица",
-                year = "1999",
-                rating = 8.7,
-                genre = "Научная фантастика",
-                posterResId = R.drawable.poster_matrix,
-                backdropResId = R.drawable.backdrop_matrix,
-                description = "Нео узнаёт, что реальность — это иллюзия, созданная машинами."
-            ),
-            Movie(
-                id = 2,
-                title = "Оппенгеймер",
-                year = "2023",
-                rating = 8.3,
-                genre = "Биография, Драма, История",
-                posterResId = R.drawable.poster_oppenheimer,
-                backdropResId = R.drawable.backdrop_oppenheimer,
-                description = "История Роберта Оппенгеймера, отца атомной бомбы, и моральных дилемм, связанных с научным прогрессом."
-            ),
-            Movie(
-                id = 3,
-                title = "Интерстеллар",
-                year = "2014",
-                rating = 8.6,
-                genre = "Драма",
-                posterResId = R.drawable.poster_interstellar,
-                backdropResId = R.drawable.backdrop_interstellar,
-                description = "Астронавты ищут новую планету для человечества."
-            ),
-            Movie(
-                id = 4,
-                title = "Тёмный рыцарь",
-                year = "2008",
-                rating = 9.0,
-                genre = "Экшен",
-                posterResId = R.drawable.poster_dark_knight,
-                backdropResId = R.drawable.backdrop_dark_knight,
-                description = "Бэтмен против Джокера в битве за душу Готэма."
-            ),
-            Movie(
-                id = 5,
-                title = "Форрест Гамп",
-                year = "1994",
-                rating = 8.8,
-                genre = "Драма",
-                posterResId = R.drawable.poster_forrest_gump,
-                backdropResId = R.drawable.backdrop_forrest_gump,
-                description = "Жизнь простого человека в эпоху великих перемен."
-            ),
-            Movie(
-                id = 6,
-                title = "Побег из Шоушенка",
-                year = "1994",
-                rating = 9.3,
-                genre = "Драма",
-                posterResId = R.drawable.poster_shawshank,
-                backdropResId = R.drawable.backdrop_shawshank,
-                description = "Надежда и дружба в тюрьме, лишённой свободы."
-            ),
-            Movie(
-                id = 7,
-                title = "Крёстный отец",
-                year = "1972",
-                rating = 9.2,
-                genre = "Криминал",
-                posterResId = R.drawable.poster_godfather,
-                backdropResId = R.drawable.backdrop_godfather,
-                description = "Семья мафии и путь превращения в крёстного отца."
-            )
-        )
+    override fun onBackPressed() {
+        val fragmentManager = supportFragmentManager
+
+        // Если в стеке есть фрагменты (например, DetailFragment) — просто возвращаемся назад
+        if (fragmentManager.backStackEntryCount > 0) {
+            fragmentManager.popBackStack()
+        }
+        // Если это корневой уровень — спрашиваем подтверждение
+        else {
+            showExitDialog()
+        }
+    }
+
+    private fun showExitDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Выйти из приложения?")
+            .setMessage("Вы действительно хотите закрыть приложение?")
+            .setPositiveButton("Да") { _, _ ->
+                finish() // Закрываем активити и приложение
+            }
+            .setNegativeButton("Нет", null) // Просто закрываем диалог
+            .setCancelable(true)
+            .show()
     }
 }

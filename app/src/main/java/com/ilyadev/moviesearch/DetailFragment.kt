@@ -1,19 +1,18 @@
 package com.ilyadev.moviesearch
 
-import android.content.Intent
+import androidx.activity.OnBackPressedCallback
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.content.Context
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.ilyadev.moviesearch.databinding.FragmentDetailBinding
 
 class DetailFragment : Fragment() {
 
-    // Приватное свойство для binding
     private var _binding: FragmentDetailBinding? = null
-    // Публичный доступ к binding (будет падать, если вызвать после onDestroyView)
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -21,7 +20,6 @@ class DetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Инициализируем binding
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -29,56 +27,46 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Получаем ID фильма из аргументов
-        val movieId = arguments?.getInt("movie_id") ?: run {
-            // Если нет ID — выходим
-            requireActivity().onBackPressed()
-            return
-        }
+        // Установка данных фильма
+        val movieId = arguments?.getInt("movie_id") ?: return
+        val movie = createMockMovies().find { it.id == movieId } ?: return
 
-        // Находим фильм по ID
-        val movie = createMockMovies().find { it.id == movieId }
-        if (movie == null) {
-            Snackbar.make(view, "Фильм не найден", Snackbar.LENGTH_LONG).show()
-            requireActivity().onBackPressed()
-            return
-        }
-
-        // Устанавливаем данные
         binding.collapsingToolbar.title = movie.title
         binding.ivBackdrop.setImageResource(movie.backdropResId)
         binding.tvTitle.text = movie.title
         binding.tvYear.text = movie.year
         binding.tvDescription.text = movie.description
 
-        // Обработка кликов по кнопкам
-        binding.btnFavorite.setOnClickListener { view ->
-            Snackbar.make(view, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+        // Кнопки
+        binding.btnFavorite.setOnClickListener {
+            Snackbar.make(it, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
         }
 
-        binding.btnWatchLater.setOnClickListener { view ->
-            Snackbar.make(view, "Добавлено в «Посмотреть позже»", Snackbar.LENGTH_SHORT).show()
+        binding.btnWatchLater.setOnClickListener {
+            Snackbar.make(it, "Добавлено в «Посмотреть позже»", Snackbar.LENGTH_SHORT).show()
         }
+    }
 
-        binding.btnShare.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Смотри фильм: ${movie.title}")
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.popBackStack()
             }
-            startActivity(Intent.createChooser(shareIntent, "Поделиться"))
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Освобождаем ссылку на binding
         _binding = null
     }
 
+    // Метод  DetailFragment.newInstance(movie.id)
     companion object {
-        /**
-         * Фабричный метод для создания фрагмента с аргументами
-         */
         fun newInstance(movieId: Int): DetailFragment {
             val args = Bundle().apply {
                 putInt("movie_id", movieId)

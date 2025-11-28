@@ -37,6 +37,7 @@ class HomeFragment : Fragment() {
                 .replace(R.id.fragment_container, DetailFragment.newInstance(movie.id))
                 .addToBackStack("detail") // Чтобы можно было вернуться
                 .commit()
+
         }
 
         // Передаём данные в адаптер

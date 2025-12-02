@@ -6,7 +6,7 @@ data class Movie(
     val year: String,
     val rating: Double,
     val genre: String,
-    val posterResId: Int,       // временно из drawable
-    val backdropResId: Int,     // фон для CollapsingToolbar
+    val posterResId: Int,
+    val backdropResId: Int,
     val description: String
 )

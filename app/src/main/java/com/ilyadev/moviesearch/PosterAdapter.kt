@@ -1,42 +1,41 @@
 package com.ilyadev.moviesearch
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ilyadev.moviesearch.databinding.ItemPosterBinding
+import android.view.animation.OvershootInterpolator
 
-class PosterAdapter(private val posters: List<Int>) : RecyclerView.Adapter<PosterAdapter.ViewHolder>() {
+class PosterAdapter(private val posters: List<Int>) :
+    RecyclerView.Adapter<PosterAdapter.ViewHolder>() {
 
-    // Внутренний класс, хранящий ссылки на View одного элемента
+    // Внутренний класс для хранения ссылок на View
     inner class ViewHolder(val binding: ItemPosterBinding) : RecyclerView.ViewHolder(binding.root)
 
-    // Вызывается, когда RecyclerView создаёт новый элемент
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemPosterBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
-    // Вызывается, чтобы заполнить данные в одном элементе
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val posterResId = posters[position]
-        holder.binding.posterImage.setImageResource(posterResId)
+        // Устанавливаем изображение постера
+        holder.binding.posterImage.setImageResource(posters[position])
 
-        // Анимация при нажатии (пример)
+        // Анимация при нажатии — ObjectAnimator (второй подход)
         holder.binding.root.setOnClickListener {
-            holder.binding.posterImage.animate()
-                .scaleX(0.9f)
-                .scaleY(0.9f)
-                .withEndAction {
-                    holder.binding.posterImage.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .start()
-                }
-                .start()
+            val scaleX = ObjectAnimator.ofFloat(holder.binding.posterImage, "scaleX", 1f, 0.9f, 1f)
+            val scaleY = ObjectAnimator.ofFloat(holder.binding.posterImage, "scaleY", 1f, 0.9f, 1f)
+
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(scaleX, scaleY)
+            animatorSet.duration = 300L
+            animatorSet.interpolator = OvershootInterpolator() // эффект "пружины"
+            animatorSet.start()
         }
     }
 
-    // Сколько всего элементов?
     override fun getItemCount(): Int = posters.size
 }

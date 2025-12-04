@@ -2,91 +2,67 @@ package com.ilyadev.moviesearch
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.Toast
-import androidx.activity.addCallback
-import androidx.appcompat.app.AlertDialog
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.snackbar.Snackbar
 
-class MainActivity : AppCompatActivity() {
+class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_detail)
 
-        // Находим RecyclerView для вертикального списка фильмов
-        val recycler = findViewById<RecyclerView>(R.id.recycler_movies_vertical)
-
-        // Создаём список фильмов
-        val movies = createMockMovies()
-
-        // Создаём адаптер с обработчиком клика
-        val adapter = MovieAdapterVertical { movie ->
-            val intent = Intent(this, DetailActivity::class.java)
-            intent.putExtra("movie_id", movie.id)
-            startActivity(intent)
-        }
-
-        // Передаём данные в адаптер
-        adapter.submitList(movies)
-
-        // Настраиваем RecyclerView
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
-
-        // Находим Toolbar
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Находим кнопки нижней навигации
-        val navHome = findViewById<ImageButton>(R.id.nav_home)
-        val navFavorites = findViewById<ImageButton>(R.id.nav_favorites)
-        val navSettings = findViewById<ImageButton>(R.id.nav_settings)
-
-        // Обработчики кликов по нижней панели
-        navHome.setOnClickListener {
-            Toast.makeText(this, "Главная", Toast.LENGTH_SHORT).show()
+        // Получаем ID фильма
+        val movieId = intent.getIntExtra("movie_id", -1)
+        if (movieId == -1) {
+            finish()
+            return
         }
 
-        navFavorites.setOnClickListener {
-            Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
+        // Находим фильм по ID
+        val movie = createMockMovies().find { it.id == movieId }
+        if (movie == null) {
+            finish()
+            return
         }
 
-        navSettings.setOnClickListener {
-            Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
+        // Устанавливаем данные
+        val collapsingToolbar = findViewById<CollapsingToolbarLayout>(R.id.collapsing_toolbar)
+        collapsingToolbar.title = movie.title
+
+        findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar).title = movie.title
+
+        findViewById<androidx.appcompat.widget.AppCompatImageView>(R.id.iv_backdrop)
+            .setImageResource(movie.backdropResId)
+
+        findViewById<androidx.appcompat.widget.AppCompatTextView>(R.id.tv_title).text = movie.title
+        findViewById<androidx.appcompat.widget.AppCompatTextView>(R.id.tv_year).text = movie.year
+        findViewById<androidx.appcompat.widget.AppCompatTextView>(R.id.tv_description).text =
+            movie.description
+
+        // Кнопки
+        findViewById<Button>(R.id.btn_favorite).setOnClickListener {
+            Snackbar.make(it, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
         }
 
-        // Настраиваем обработку кнопки "Назад"
-        setupOnBackPressed()
+        findViewById<Button>(R.id.btn_watch_later).setOnClickListener {
+            Snackbar.make(it, "Добавлено в «Посмотреть позже»", Snackbar.LENGTH_SHORT).show()
+        }
+
+        findViewById<Button>(R.id.btn_share).setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, "Смотри фильм: ${movie.title}")
+            }
+            startActivity(Intent.createChooser(shareIntent, "Поделиться"))
+        }
     }
 
-    /**
-     * Настраивает поведение при нажатии кнопки "Назад"
-     */
-    private fun setupOnBackPressed() {
-        onBackPressedDispatcher.addCallback(this) {
-            showExitDialog()
-        }
-    }
-
-    /**
-     * Показывает диалог подтверждения выхода из приложения
-     */
-    private fun showExitDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Выйти из приложения?")
-            .setMessage("Вы действительно хотите закрыть приложение?")
-            .setPositiveButton("Да") { _, _ -> finish() }
-            .setNegativeButton("Нет", null)
-            .show()
-    }
-
-    /**
-     * Возвращает список мок-данных о фильмах
-     */
     private fun createMockMovies(): List<Movie> {
         return listOf(
             Movie(

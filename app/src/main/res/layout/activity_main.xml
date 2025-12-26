@@ -81,6 +81,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/horizontal_scroll" />
 
+    <!-- Контейнер для фрагментов -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/horizontal_scroll"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Вертикальный список фильмов (нижний) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_movies_vertical"

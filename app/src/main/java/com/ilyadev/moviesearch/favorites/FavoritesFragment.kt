@@ -1,4 +1,5 @@
-package com.ilyadev.moviesearch.ui.home
+// Файл: FavoritesFragment.kt
+package com.ilyadev.moviesearch.favorites
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,13 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ilyadev.moviesearch.MovieRepository
-import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
+import com.ilyadev.moviesearch.databinding.FragmentFavoritesBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical
 
-class HomeFragment : Fragment() {
+class FavoritesFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -23,7 +24,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Создаём binding
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -37,11 +38,12 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Передаём данные
-        adapter.submitList(MovieRepository.getAllMovies())
+        // Получаем избранные фильмы
+        val favorites = MovieRepository.favorites
+        adapter.submitList(favorites)
 
         // Настраиваем RecyclerView
-        binding.recyclerMovies.apply {
+        binding.recyclerFavorites.apply {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = adapter
         }

@@ -11,18 +11,21 @@ import com.ilyadev.moviesearch.MovieRepository
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical
+import androidx.appcompat.widget.SearchView
+import com.ilyadev.moviesearch.R
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var searchView: SearchView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Создаём binding
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -37,19 +40,39 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Передаём данные
+        // Показываем все фильмы при старте
         adapter.submitList(MovieRepository.getAllMovies())
 
         // Настраиваем RecyclerView
-        binding.recyclerMovies.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            this.adapter = adapter
-        }
+        binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerMovies.adapter = adapter
+
+        // Получаем доступ к SearchView из MainActivity
+        searchView = requireActivity().findViewById(R.id.search_view)
+
+        // Настраиваем слушатель поиска
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val query = newText.orEmpty()
+                val filteredList = if (query.isEmpty()) {
+                    MovieRepository.getAllMovies()
+                } else {
+                    MovieRepository.getAllMovies()
+                        .filter { movie ->
+                            movie.title.contains(query, ignoreCase = true) ||
+                                    movie.genre.contains(query, ignoreCase = true)
+                        }
+                }
+                adapter.submitList(filteredList)
+                return true
+            }
+        })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Очищаем ссылку
         _binding = null
     }
 }

@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjectDreams">
         <activity
-            android:name=".DetailActivity"
+            android:name=".detail.DetailActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

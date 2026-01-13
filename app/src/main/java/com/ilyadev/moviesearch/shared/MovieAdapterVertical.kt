@@ -1,4 +1,4 @@
-package com.ilyadev.moviesearch
+package com.ilyadev.moviesearch.shared
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
+import com.ilyadev.moviesearch.model.Movie
 
 /**
  * Адаптер для вертикального списка фильмов
@@ -36,12 +37,13 @@ class MovieAdapterVertical(
         val movie = getItem(position)
 
         holder.binding.apply {
+            posterImage.setImageDrawable(null) // или .setImageResource(0)
             posterImage.setImageResource(movie.posterResId)
+
             movieTitle.text = movie.title
             movieYear.text = movie.year
             movieDescription.text = movie.description
 
-            // Обработчик клика по карточке
             root.setOnClickListener {
                 onItemClick(movie)
             }

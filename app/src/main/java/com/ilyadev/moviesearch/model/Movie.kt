@@ -1,4 +1,4 @@
-package com.ilyadev.moviesearch
+package com.ilyadev.moviesearch.model
 
 data class Movie(
     val id: Int,

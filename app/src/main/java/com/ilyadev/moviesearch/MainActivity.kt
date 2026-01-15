@@ -30,9 +30,12 @@ class MainActivity : AppCompatActivity() {
         navHome.setOnClickListener {
             replaceFragment(HomeFragment(), R.anim.slide_in_from_right, R.anim.slide_out_to_left)
         }
-
         navFavorites.setOnClickListener {
-            replaceFragment(FavoritesFragment(), R.anim.slide_in_from_left, R.anim.slide_out_to_right)
+            replaceFragment(
+                FavoritesFragment(),
+                R.anim.slide_in_from_left,
+                R.anim.slide_out_to_right
+            )
         }
 
         navSettings.setOnClickListener {

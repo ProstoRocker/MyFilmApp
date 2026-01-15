@@ -1,4 +1,4 @@
-package com.ilyadev.moviesearch.ui.home
+package com.ilyadev.moviesearch
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,19 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ilyadev.moviesearch.MovieRepository
+import androidx.appcompat.widget.SearchView
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical
-import androidx.appcompat.widget.SearchView
-import com.ilyadev.moviesearch.R
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var searchView: SearchView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,23 +36,21 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Показываем все фильмы при старте
+        // Показываем все фильмы
         adapter.submitList(MovieRepository.getAllMovies())
-
-        // Настраиваем RecyclerView
         binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerMovies.adapter = adapter
 
-        // Получаем доступ к SearchView из MainActivity
-        searchView = requireActivity().findViewById(R.id.search_view)
+        // Получаем SearchView из MainActivity
+        val searchView = requireActivity().findViewById<SearchView>(R.id.search_view)
 
-        // Настраиваем слушатель поиска
+        // Настраиваем фильтрацию
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 val query = newText.orEmpty()
-                val filteredList = if (query.isEmpty()) {
+                val filtered = if (query.isEmpty()) {
                     MovieRepository.getAllMovies()
                 } else {
                     MovieRepository.getAllMovies()
@@ -65,7 +59,7 @@ class HomeFragment : Fragment() {
                                     movie.genre.contains(query, ignoreCase = true)
                         }
                 }
-                adapter.submitList(filteredList)
+                adapter.submitList(filtered)
                 return true
             }
         })

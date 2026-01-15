@@ -2,9 +2,11 @@ package com.ilyadev.moviesearch.shared
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
 import com.ilyadev.moviesearch.model.Movie
 
@@ -43,6 +45,11 @@ class MovieAdapterVertical(
             movieTitle.text = movie.title
             movieYear.text = movie.year
             movieDescription.text = movie.description
+
+            // Применяем анимацию
+            root.startAnimation(
+                AnimationUtils.loadAnimation(root.context, R.anim.slide_in_from_bottom)
+            )
 
             root.setOnClickListener {
                 onItemClick(movie)

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ilyadev.moviesearch.MovieRepository
+import com.ilyadev.moviesearch.data.repository.MovieRepository
 import com.ilyadev.moviesearch.databinding.FragmentFavoritesBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical

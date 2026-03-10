@@ -11,7 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
-import com.ilyadev.moviesearch.MovieRepository
+import com.ilyadev.moviesearch.data.repository.MovieRepository
 import com.ilyadev.moviesearch.R
 
 class DetailActivity : AppCompatActivity() {

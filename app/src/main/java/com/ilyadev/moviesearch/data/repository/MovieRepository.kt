@@ -1,7 +1,6 @@
-// Файл: MovieRepository.kt
-package com.ilyadev.moviesearch
+package com.ilyadev.moviesearch.data.repository
 
-import android.content.Context
+import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.model.Movie
 
 object MovieRepository {

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ilyadev.moviesearch"
-        minSdk = 21
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -39,6 +39,9 @@ android {
 }
 
 dependencies {
+
+    //Splash Screen с векторной анимацией (Android 12+)
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")

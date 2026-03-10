@@ -18,6 +18,7 @@
         app:title="FilmsSearch"
         app:titleTextColor="#FFFFFF" />
 
+
     <!-- Поисковое поле -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"

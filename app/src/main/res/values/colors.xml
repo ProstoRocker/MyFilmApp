@@ -13,4 +13,14 @@
     <!-- Фон -->
     <color name="background">#F8F9FA</color>         <!-- Светлый фон -->
     <color name="surface">#FFFFFF</color>            <!-- Карточки, панели -->
+
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="red_500">#F44336</color>    <!-- Ярко-красный -->
+    <color name="green_500">#4CAF50</color>  <!-- Ярко-зелёный -->
 </resources>

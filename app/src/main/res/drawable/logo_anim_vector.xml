@@ -1,8 +1,6 @@
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:drawable="@drawable/logo_path">
-
     <target
-        android:name="logo_path"
-        android:animation="@anim/vectortransition" />
-
+        android:name="logo"
+        android:animation="@animator/trim_path_end" />
 </animated-vector>

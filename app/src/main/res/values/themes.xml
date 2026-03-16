@@ -1,24 +1,16 @@
 <resources>
-    <!-- Основная тема приложения -->
-    <style name="Theme.ProjectDreams" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Основная тема -->
+    <style name="Theme.App" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <!-- Другие цвета... -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <!-- Тема для Splash Screen (обязательна для Android 12+) -->
-    <style name="Theme.ProjectDreams.SplashScreen" parent="Theme.SplashScreen">
-        <!-- Анимированный векторный значок -->
+    <!-- Splash Theme -->
+    <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo_anim_vector</item>
-
-        <!-- Цвет фона splash screen -->
-        <item name="windowSplashScreenBackground">#00BCD4</item> <!-- Голубой фон -->
-
-        <!-- Продолжительность анимации в миллисекундах -->
+        <item name="windowSplashScreenBackground">@color/primary</item>
         <item name="windowSplashScreenAnimationDuration">1500</item>
-
-        <!-- Тема, которая применится ПОСЛЕ splash screen -->
-        <item name="postSplashScreenTheme">@style/Theme.ProjectDreams</item>
+        <item name="postSplashScreenTheme">@style/Theme.App</item>
     </style>
 </resources>

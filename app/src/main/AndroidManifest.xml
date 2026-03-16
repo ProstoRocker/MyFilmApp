@@ -10,21 +10,30 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ProjectDreams">
+        android:theme="@style/Theme.App"> <!-- ← Ваша основная тема -->
+
+        <!-- 1. Splash Activity — точка входа -->
         <activity
-            android:name=".detail.DetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ProjectDreams">
+            android:name=".SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 2. MainActivity — основной экран -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <!-- 3. DetailActivity -->
+        <activity
+            android:name=".detail.DetailActivity"
+            android:exported="false" />
+
+        <!-- 4. Другие фрагменты не указываются — они внутри MainActivity -->
+
     </application>
 
 </manifest>

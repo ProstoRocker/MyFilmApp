@@ -18,6 +18,7 @@
         app:title="FilmsSearch"
         app:titleTextColor="#FFFFFF" />
 
+
     <!-- Поисковое поле -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
@@ -87,6 +88,17 @@
             android:src="@drawable/ic_favorite" />
 
         <ImageButton
+            android:id="@+id/nav_watch_later"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/ic_watch_later"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Посмотреть позже" />
+
+        <ImageButton
             android:id="@+id/nav_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -96,6 +108,17 @@
             android:padding="8dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_settings" />
+
+        <ImageButton
+            android:id="@+id/nav_collections"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/ic_collections"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Подборки" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

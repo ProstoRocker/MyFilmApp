@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
 import com.ilyadev.moviesearch.model.Movie
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 
 /**
  * Адаптер для вертикального списка фильмов
@@ -39,18 +42,46 @@ class MovieAdapterVertical(
         val movie = getItem(position)
 
         holder.binding.apply {
-            posterImage.setImageDrawable(null) // или .setImageResource(0)
+            // --- 1. Загрузка данных ---
             posterImage.setImageResource(movie.posterResId)
-
             movieTitle.text = movie.title
             movieYear.text = movie.year
             movieDescription.text = movie.description
 
-            // Применяем анимацию
+            // --- 2. Установка рейтинга ---
+            val ratingText = root.findViewById<TextView>(R.id.tv_rating)
+            val progressBar = root.findViewById<ProgressBar>(R.id.progress_bar)
+
+            if (ratingText != null && progressBar != null) {
+                val progress = (movie.rating * 10).toInt().coerceIn(0, 100)
+                ratingText.text = movie.rating.toString()
+
+                // Сначала 0
+                progressBar.progress = 0
+                progressBar.alpha = 0f
+
+                // Анимация появления + заполнения
+                progressBar.animate()
+                    .alpha(1f)
+                    .setDuration(400)
+                    .start()
+
+                // Анимация заполнения
+                android.animation.ValueAnimator.ofInt(0, progress).apply {
+                    duration = 800
+                    addUpdateListener { animator ->
+                        progressBar.progress = animator.animatedValue as Int
+                    }
+                    start()
+                }
+            }
+
+            // --- 3. Анимация появления карточки ---
             root.startAnimation(
                 AnimationUtils.loadAnimation(root.context, R.anim.slide_in_from_bottom)
             )
 
+            // --- 4. Клик по карточке ---
             root.setOnClickListener {
                 onItemClick(movie)
             }
@@ -59,7 +90,7 @@ class MovieAdapterVertical(
 }
 
 /**
- * Класс для сравнения фильмов при обновлении списка
+ * Класс для сравнения фильмов при обновлении списка (DiffCallback)
  */
 class MovieDiffCallback : DiffUtil.ItemCallback<Movie>() {
     override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {

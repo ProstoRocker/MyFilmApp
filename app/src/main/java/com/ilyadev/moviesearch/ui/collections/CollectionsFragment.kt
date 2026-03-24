@@ -7,6 +7,7 @@ import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ilyadev.moviesearch.databinding.FragmentCollectionsBinding
+import com.ilyadev.moviesearch.utils.circularReveal
 import kotlin.math.hypot
 
 class CollectionsFragment : Fragment() {
@@ -27,13 +28,11 @@ class CollectionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.tvTitle.text = "Подборки"
 
-        // 🔥 Circular Reveal
         if (!isRevealed) {
             view.post {
-                createCircularReveal(binding.root)
+                binding.root.circularReveal(800)
             }
             isRevealed = true
         }

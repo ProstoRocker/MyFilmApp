@@ -13,7 +13,6 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <!-- Постер -->
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="120dp"
@@ -21,7 +20,6 @@
             android:contentDescription="Постер фильма"
             android:scaleType="centerCrop" />
 
-        <!-- Информация о фильме -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -53,7 +51,6 @@
                 android:textColor="#333333"
                 android:textSize="14sp" />
 
-            <!-- Рейтинг и прогресс -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,7 +61,6 @@
                     android:id="@+id/tv_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="7.7"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="#212121" />
@@ -74,9 +70,9 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="4dp"
-                    android:progressDrawable="@drawable/rating_progress_drawable"
                     android:max="100"
-                    android:progress="77" />
+                    android:progress="77"
+                    android:progressDrawable="@drawable/rating_progress_drawable" />
 
             </LinearLayout>
 

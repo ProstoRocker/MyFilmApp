@@ -44,6 +44,9 @@ dependencies {
     //Splash Screen с векторной анимацией (Android 12+)
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
+
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")

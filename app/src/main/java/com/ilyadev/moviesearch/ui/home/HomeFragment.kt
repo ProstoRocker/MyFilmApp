@@ -6,19 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ilyadev.moviesearch.R
-import com.ilyadev.moviesearch.data.repository.MovieRepository
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical
+import com.ilyadev.moviesearch.model.Movie
 import com.ilyadev.moviesearch.utils.circularReveal
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var viewModel: HomeViewModel
+    private lateinit var adapter: MovieAdapterVertical
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,45 +35,53 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔥 Запускаем анимацию появления
-        binding.root.visibility = View.INVISIBLE
-        view.post {
-            binding.root.circularReveal(800)
-            setupRecyclerView()
-        }
+        // 1. Настройка RecyclerView
+        binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
+        adapter = MovieAdapterVertical { movie ->
 
-        // Подключаем поиск
-        val searchView = requireActivity().findViewById<SearchView>(R.id.search_view)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                val query = newText.orEmpty()
-                val filtered = if (query.isEmpty()) {
-                    MovieRepository.getAllMovies()
-                } else {
-                    MovieRepository.getAllMovies()
-                        .filter { movie ->
-                            movie.title.contains(query, ignoreCase = true) ||
-                                    movie.genre.contains(query, ignoreCase = true)
-                        }
-                }
-                (binding.recyclerMovies.adapter as? MovieAdapterVertical)?.submitList(filtered)
-                return true
-            }
-        })
-    }
-
-    private fun setupRecyclerView() {
-        val adapter = MovieAdapterVertical { movie ->
+            //  Переход по клику на карточку
             val intent = Intent(requireContext(), DetailActivity::class.java)
             intent.putExtra("movie_id", movie.id)
             startActivity(intent)
         }
-
-        adapter.submitList(MovieRepository.getAllMovies())
-        binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerMovies.adapter = adapter
+
+        // 2. Инициализация ViewModel
+        viewModel = HomeViewModel()
+
+        // 3. Подписка на данные — с безопасным доступом
+        viewModel.setOnMoviesLoaded { movies ->
+            safeBind {
+                adapter.submitList(movies)
+            }
+        }
+
+        viewModel.setOnLoadingChanged { isLoading ->
+            safeBind {
+                progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+        }
+
+        // 4. Поиск
+        val searchView = requireActivity().findViewById<SearchView>(R.id.search_view)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.search(newText.orEmpty())
+                return true
+            }
+        })
+
+        // 5. Анимация
+        binding.root.post {
+            binding.root.circularReveal(800)
+        }
+    }
+
+    private fun safeBind(block: FragmentHomeBinding.() -> Unit) {
+        _binding?.let { binding ->
+            binding.block()
+        }
     }
 
     override fun onDestroyView() {

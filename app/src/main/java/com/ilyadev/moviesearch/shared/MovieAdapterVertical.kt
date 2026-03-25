@@ -9,35 +9,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
 import com.ilyadev.moviesearch.model.Movie
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
 
-/**
- * Адаптер для вертикального списка фильмов
- */
 class MovieAdapterVertical(
     private val onItemClick: (Movie) -> Unit
 ) : ListAdapter<Movie, MovieAdapterVertical.MovieViewHolder>(MovieDiffCallback()) {
 
-    /**
-     * ViewHolder, хранящий ссылки на View одного элемента
-     */
     inner class MovieViewHolder(val binding: ItemMovieVerticalBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    /**
-     * Создаёт новый ViewHolder из макета item_movie_vertical.xml
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMovieVerticalBinding.inflate(inflater, parent, false)
         return MovieViewHolder(binding)
     }
 
-    /**
-     * Привязывает данные фильма к UI
-     */
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = getItem(position)
 
@@ -49,31 +34,30 @@ class MovieAdapterVertical(
             movieDescription.text = movie.description
 
             // --- 2. Установка рейтинга ---
-            val ratingText = root.findViewById<TextView>(R.id.tv_rating)
-            val progressBar = root.findViewById<ProgressBar>(R.id.progress_bar)
+            tvRating.text = movie.rating.toString()
 
-            if (ratingText != null && progressBar != null) {
-                val progress = (movie.rating * 10).toInt().coerceIn(0, 100)
-                ratingText.text = movie.rating.toString()
+            // 🔥 Здесь — обработка клика по всей карточке
+            root.setOnClickListener {
+                onItemClick(movie)  // ← Вызывает переданный callback
+            }
 
-                // Сначала 0
-                progressBar.progress = 0
-                progressBar.alpha = 0f
+            // Сброс прогресса
+            progressBar.progress = 0
+            progressBar.alpha = 0f
 
-                // Анимация появления + заполнения
-                progressBar.animate()
-                    .alpha(1f)
-                    .setDuration(400)
-                    .start()
+            // Анимация появления
+            progressBar.animate()
+                .alpha(1f)
+                .setDuration(400)
+                .start()
 
-                // Анимация заполнения
-                android.animation.ValueAnimator.ofInt(0, progress).apply {
-                    duration = 800
-                    addUpdateListener { animator ->
-                        progressBar.progress = animator.animatedValue as Int
-                    }
-                    start()
+            // Анимация заполнения
+            android.animation.ValueAnimator.ofInt(0, (movie.rating * 10).toInt()).apply {
+                duration = 800
+                addUpdateListener { animator ->
+                    progressBar.progress = animator.animatedValue as Int
                 }
+                start()
             }
 
             // --- 3. Анимация появления карточки ---
@@ -89,15 +73,11 @@ class MovieAdapterVertical(
     }
 }
 
-/**
- * Класс для сравнения фильмов при обновлении списка (DiffCallback)
- */
+// DiffUtil Callback
 class MovieDiffCallback : DiffUtil.ItemCallback<Movie>() {
-    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-        return oldItem.id == newItem.id
-    }
+    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean =
+        oldItem.id == newItem.id
 
-    override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-        return oldItem == newItem
-    }
+    override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean =
+        oldItem == newItem
 }

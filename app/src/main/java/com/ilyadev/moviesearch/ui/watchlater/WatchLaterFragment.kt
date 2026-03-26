@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.Fragment
 import com.ilyadev.moviesearch.databinding.FragmentWatchLaterBinding
+import com.ilyadev.moviesearch.utils.circularReveal
 import kotlin.math.hypot
 
 class WatchLaterFragment : Fragment() {
@@ -31,10 +32,9 @@ class WatchLaterFragment : Fragment() {
 
         binding.tvTitle.text = "Посмотреть позже"
 
-        // 🔥 Circular Reveal
         if (!isRevealed) {
             view.post {
-                createCircularReveal(binding.root)
+                binding.root.circularReveal(800)
             }
             isRevealed = true
         }

@@ -13,7 +13,6 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <!-- Постер -->
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="120dp"
@@ -21,7 +20,6 @@
             android:contentDescription="Постер фильма"
             android:scaleType="centerCrop" />
 
-        <!-- Информация о фильме -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -52,6 +50,32 @@
                 android:lineSpacingExtra="4dp"
                 android:textColor="#333333"
                 android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:max="100"
+                    android:progress="77"
+                    android:progressDrawable="@drawable/rating_progress_drawable" />
+
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

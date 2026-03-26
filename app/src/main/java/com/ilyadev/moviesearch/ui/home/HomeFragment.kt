@@ -7,21 +7,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
-import com.ilyadev.moviesearch.shared.MovieAdapterVertical
-import com.ilyadev.moviesearch.model.Movie
+import com.ilyadev.moviesearch.model.MovieDto
+import com.ilyadev.moviesearch.shared.MoviePagingAdapter
 import com.ilyadev.moviesearch.utils.circularReveal
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: HomeViewModel
-    private lateinit var adapter: MovieAdapterVertical
+    private lateinit var viewModel: PagingHomeViewModel
+    private lateinit var adapter: MoviePagingAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,53 +41,50 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Настройка RecyclerView
         binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
-        adapter = MovieAdapterVertical { movie ->
-
-            //  Переход по клику на карточку
+        adapter = MoviePagingAdapter { movie ->
             val intent = Intent(requireContext(), DetailActivity::class.java)
             intent.putExtra("movie_id", movie.id)
             startActivity(intent)
         }
         binding.recyclerMovies.adapter = adapter
+        val testMovie = MovieDto(
+            id = 1,
+            title = "Тестовый фильм",
+            releaseDate = "2024-01-01",
+            rating = 8.5,
+            genreIds = listOf(28),
+            posterPath = null,
+            backdropPath = null
+        )
 
-        // 2. Инициализация ViewModel
-        viewModel = HomeViewModel()
-
-        // 3. Подписка на данные — с безопасным доступом
-        viewModel.setOnMoviesLoaded { movies ->
-            safeBind {
-                adapter.submitList(movies)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.submitData(PagingData.from(listOf(testMovie)))
             }
         }
 
-        viewModel.setOnLoadingChanged { isLoading ->
-            safeBind {
-                progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        viewModel = PagingHomeViewModel()
+
+        // ✅ Корректный способ: collectLatest внутри launch + repeatOnLifecycle
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.movies.collectLatest { pagingData ->
+                    // Убедимся, что адаптер и binding ещё существуют
+                    if (isAdded && _binding != null) {
+                        adapter.submitData(pagingData)
+                    }
+                }
             }
         }
 
-        // 4. Поиск
-        val searchView = requireActivity().findViewById<SearchView>(R.id.search_view)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.search(newText.orEmpty())
-                return true
-            }
-        })
-
-        // 5. Анимация
         binding.root.post {
             binding.root.circularReveal(800)
         }
     }
 
     private fun safeBind(block: FragmentHomeBinding.() -> Unit) {
-        _binding?.let { binding ->
-            binding.block()
-        }
+        _binding?.let { it.block() }
     }
 
     override fun onDestroyView() {

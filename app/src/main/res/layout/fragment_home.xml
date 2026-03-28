@@ -4,19 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Контейнер для RecyclerView -->
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerMovies"
+        android:id="@+id/recycler_movies"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_movie_vertical" />
 
-    <!-- Индикатор загрузки (показывается при loading = true) -->
+    <!-- Прогресс-бар (показывается при первой загрузке) -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:visibility="visible" />
+
+    <!-- Сообщение "Нет данных" -->
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:text="Фильмы не загружены\nПроверьте интернет"
+        android:textColor="#666666"
+        android:textSize="16sp"
         android:visibility="gone" />
 
 </FrameLayout>

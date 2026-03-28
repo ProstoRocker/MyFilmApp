@@ -4,19 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Контейнер для RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerMovies"
+        android:id="@+id/recycler_movies"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_movie_vertical" />
+        android:layout_height="match_parent" />
 
-    <!-- Индикатор загрузки (показывается при loading = true) -->
+    <!-- Показывается, пока нет данных -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </FrameLayout>

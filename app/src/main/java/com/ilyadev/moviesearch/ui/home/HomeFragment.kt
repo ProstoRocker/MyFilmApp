@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
@@ -37,10 +38,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Настройка RecyclerView
         binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
-
-        // Создаём адаптер с обработкой клика
         adapter = MoviePagingAdapter { movie ->
             val intent = Intent(requireContext(), DetailActivity::class.java)
             intent.putExtra("movie_id", movie.id)
@@ -48,21 +46,26 @@ class HomeFragment : Fragment() {
         }
         binding.recyclerMovies.adapter = adapter
 
-        // Инициализация ViewModel
         viewModel = PagingHomeViewModel()
 
-        // Загрузка данных через Paging
+        // Устанавливаем listener на адаптер
+        adapter.addLoadStateListener { loadState ->
+            val isLoading = loadState is LoadState.Loading
+            val hasNoData = adapter.itemCount == 0 && !isLoading
+
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.emptyText.visibility = if (hasNoData) View.VISIBLE else View.GONE
+        }
+
+        // Загрузка данных
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movies.collectLatest { pagingData ->
-                    // Скрываем индикатор после первой загрузки
-                    binding.progressBar.visibility = View.GONE
                     adapter.submitData(pagingData)
                 }
             }
         }
 
-        // Анимация появления экрана (если нужно)
         binding.root.post {
             binding.root.circularReveal(800)
         }

@@ -53,6 +53,7 @@ class MoviePagingAdapter(
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<MovieDto>() {
             override fun areItemsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean =
                 oldItem.id == newItem.id
+
             override fun areContentsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean =
                 oldItem == newItem
         }

@@ -16,8 +16,10 @@ class PagingHomeViewModel : ViewModel() {
         config = PagingConfig(
             pageSize = 20,
             prefetchDistance = 5,
-            enablePlaceholders = false
+            initialLoadSize = 40,     // ← Загружает больше при старте
+            maxSize = 200,             // ← Лимит в памяти
+            enablePlaceholders = false // ← Без "пустых" ячеек
         ),
         pagingSourceFactory = { MoviesPagingSource() }
-    ).flow.cachedIn(viewModelScope)
+    ).flow.cachedIn(viewModelScope) // ← Сохраняет данные при повороте экрана
 }

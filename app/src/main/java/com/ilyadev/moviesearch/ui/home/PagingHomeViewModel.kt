@@ -7,19 +7,19 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ilyadev.moviesearch.model.MovieDto
+import com.ilyadev.moviesearch.network.MoviesApiService
 import com.ilyadev.moviesearch.paging.MoviesPagingSource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class PagingHomeViewModel : ViewModel() {
+@HiltViewModel
+class PagingHomeViewModel @Inject constructor(
+    private val apiService: MoviesApiService
+) : ViewModel() {
 
     val movies: Flow<PagingData<MovieDto>> = Pager(
-        config = PagingConfig(
-            pageSize = 20,
-            prefetchDistance = 5,
-            initialLoadSize = 40,     // ← Загружает больше при старте
-            maxSize = 200,             // ← Лимит в памяти
-            enablePlaceholders = false // ← Без "пустых" ячеек
-        ),
-        pagingSourceFactory = { MoviesPagingSource() }
-    ).flow.cachedIn(viewModelScope) // ← Сохраняет данные при повороте экрана
+        config = PagingConfig(pageSize = 20, prefetchDistance = 5),
+        pagingSourceFactory = { MoviesPagingSource(apiService) }
+    ).flow.cachedIn(viewModelScope)
 }

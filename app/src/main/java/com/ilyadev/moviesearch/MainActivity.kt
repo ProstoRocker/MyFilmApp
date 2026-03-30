@@ -11,7 +11,9 @@ import com.ilyadev.moviesearch.ui.collections.CollectionsFragment
 import com.ilyadev.moviesearch.ui.favorites.FavoritesFragment
 import com.ilyadev.moviesearch.ui.home.HomeFragment
 import com.ilyadev.moviesearch.ui.watchlater.WatchLaterFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null

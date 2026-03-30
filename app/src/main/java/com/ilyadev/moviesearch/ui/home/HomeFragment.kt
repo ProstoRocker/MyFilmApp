@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels // ✅ Обязательно!
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,15 +16,19 @@ import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MoviePagingAdapter
 import com.ilyadev.moviesearch.utils.circularReveal
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: PagingHomeViewModel
+    // ✅ Заменяем lateinit на делегата
+    private val viewModel: PagingHomeViewModel by viewModels()
+
     private lateinit var adapter: MoviePagingAdapter
 
     override fun onCreateView(
@@ -46,9 +51,6 @@ class HomeFragment : Fragment() {
         }
         binding.recyclerMovies.adapter = adapter
 
-        viewModel = PagingHomeViewModel()
-
-        // Устанавливаем listener на адаптер
         adapter.addLoadStateListener { loadState ->
             val isLoading = loadState is LoadState.Loading
             val hasNoData = adapter.itemCount == 0 && !isLoading
@@ -57,7 +59,6 @@ class HomeFragment : Fragment() {
             binding.emptyText.visibility = if (hasNoData) View.VISIBLE else View.GONE
         }
 
-        // Загрузка данных
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movies.collectLatest { pagingData ->

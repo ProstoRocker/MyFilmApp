@@ -9,17 +9,15 @@ import androidx.paging.cachedIn
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
 import com.ilyadev.moviesearch.paging.MoviesPagingSource
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-@HiltViewModel
 class PagingHomeViewModel @Inject constructor(
     private val apiService: MoviesApiService
 ) : ViewModel() {
 
     val movies: Flow<PagingData<MovieDto>> = Pager(
-        config = PagingConfig(pageSize = 20, prefetchDistance = 5),
+        config = PagingConfig(pageSize = 20),
         pagingSourceFactory = { MoviesPagingSource(apiService) }
     ).flow.cachedIn(viewModelScope)
 }

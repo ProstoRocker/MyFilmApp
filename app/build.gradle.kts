@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -34,14 +33,9 @@ android {
 
 dependencies {
 
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.50")
-    kapt("com.google.dagger:hilt-compiler:2.50")
-
-    // Hilt + AndroidX
-    implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
-    implementation("androidx.hilt:hilt-work:1.2.0")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    //Dagger
+    implementation("com.google.dagger:dagger:2.50")
+    kapt("com.google.dagger:dagger-compiler:2.50")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")

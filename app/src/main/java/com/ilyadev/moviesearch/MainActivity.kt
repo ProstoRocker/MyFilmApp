@@ -12,6 +12,7 @@ import com.ilyadev.moviesearch.ui.favorites.FavoritesFragment
 import com.ilyadev.moviesearch.ui.home.HomeFragment
 import com.ilyadev.moviesearch.ui.watchlater.WatchLaterFragment
 
+
 class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
@@ -32,15 +33,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.navFavorites.setOnClickListener {
-            replaceFragment(FavoritesFragment(), R.anim.slide_in_from_left, R.anim.slide_out_to_right)
+            replaceFragment(
+                FavoritesFragment(),
+                R.anim.slide_in_from_left,
+                R.anim.slide_out_to_right
+            )
         }
 
         binding.navWatchLater.setOnClickListener {
-            replaceFragment(WatchLaterFragment(), R.anim.slide_in_from_right, R.anim.slide_out_to_left)
+            replaceFragment(
+                WatchLaterFragment(),
+                R.anim.slide_in_from_right,
+                R.anim.slide_out_to_left
+            )
         }
 
         binding.navCollections.setOnClickListener {
-            replaceFragment(CollectionsFragment(), R.anim.slide_in_from_left, R.anim.slide_out_to_right)
+            replaceFragment(
+                CollectionsFragment(),
+                R.anim.slide_in_from_left,
+                R.anim.slide_out_to_right
+            )
         }
 
         binding.navSettings.setOnClickListener {

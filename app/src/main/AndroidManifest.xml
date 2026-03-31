@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Разрешение на интернет -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".di.AppApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,7 +14,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.App"> <!-- ← Ваша основная тема -->
+        android:theme="@style/Theme.App"> <!-- ← Основная тема -->
+
 
         <!-- 1. Splash Activity — точка входа -->
         <activity

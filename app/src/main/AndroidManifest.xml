@@ -37,7 +37,10 @@
             android:name=".detail.DetailActivity"
             android:exported="false" />
 
-        <!-- 4. Другие фрагменты не указываются — они внутри MainActivity -->
+        <!-- 4. SettingsActivity -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false" />
 
     </application>
 

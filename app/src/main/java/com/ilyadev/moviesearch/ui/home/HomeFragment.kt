@@ -1,6 +1,8 @@
 package com.ilyadev.moviesearch.ui.home
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,13 +22,14 @@ import com.ilyadev.moviesearch.di.AppApplication
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: PagingHomeViewModel
     private lateinit var adapter: MoviePagingAdapter
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,9 +51,8 @@ class HomeFragment : Fragment() {
             @Suppress("UNCHECKED_CAST")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass == PagingHomeViewModel::class.java) {
-                    // Используем компонент Dagger для получения зависимостей
                     val apiService = appComponent.provideApiService()
-                    return PagingHomeViewModel(apiService) as T
+                    return PagingHomeViewModel(apiService, requireContext()) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
@@ -58,6 +60,9 @@ class HomeFragment : Fragment() {
 
         // Создаём ViewModel через фабрику
         viewModel = ViewModelProvider(this, factory)[PagingHomeViewModel::class.java]
+
+        // Инициализируем SharedPreferences
+        sharedPrefs = requireContext().getSharedPreferences("app_settings", Context.MODE_PRIVATE)
 
         // Настройка RecyclerView
         binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
@@ -77,7 +82,7 @@ class HomeFragment : Fragment() {
             binding.emptyText.visibility = if (hasNoData) View.VISIBLE else View.GONE
         }
 
-        // Загрузка данных через Paging
+        // Загрузка данных
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movies.collectLatest { pagingData ->
@@ -89,6 +94,34 @@ class HomeFragment : Fragment() {
         // Анимация появления экрана
         binding.root.post {
             binding.root.circularReveal(800)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Подписываемся на изменения
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onPause() {
+        // Отписываемся во избежание утечек
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "pref_default_category") {
+            // Категория изменилась — перезапустим загрузку
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.currentCategory.collectLatest { category ->
+                        // Перезапускаем пагинацию
+                        viewModel.movies.collectLatest { pagingData ->
+                            adapter.submitData(pagingData)
+                        }
+                    }
+                }
+            }
         }
     }
 

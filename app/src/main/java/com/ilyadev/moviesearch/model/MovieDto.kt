@@ -1,14 +1,17 @@
 package com.ilyadev.moviesearch.model
-// Модель данных для ответа API
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "movies")
 data class MovieDto(
-    val id: Int,
+    @PrimaryKey val id: Int,
     val title: String,
     @SerializedName("release_date") val releaseDate: String,
-    @SerializedName("vote_average") val rating: Double,
+    @SerializedName("vote_average") val voteAverage: Double,
     @SerializedName("genre_ids") val genreIds: List<Int>,
     @SerializedName("poster_path") val posterPath: String?,
-    @SerializedName("backdrop_path") val backdropPath: String?
+    @SerializedName("backdrop_path") val backdropPath: String?,
+    var isFavorite: Boolean = false
 )

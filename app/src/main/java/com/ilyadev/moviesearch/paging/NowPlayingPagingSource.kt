@@ -8,7 +8,8 @@ import com.ilyadev.moviesearch.network.MoviesApiService
 import retrofit2.HttpException
 import java.io.IOException
 
-class NowPlayingPagingSource(private val apiService: MoviesApiService) : PagingSource<Int, MovieDto>() {
+class NowPlayingPagingSource(private val apiService: MoviesApiService) :
+    PagingSource<Int, MovieDto>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {

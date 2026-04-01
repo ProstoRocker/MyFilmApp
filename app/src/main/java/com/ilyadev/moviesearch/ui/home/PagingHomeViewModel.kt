@@ -1,5 +1,6 @@
 package com.ilyadev.moviesearch.ui.home
 
+
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
@@ -8,12 +9,17 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.ilyadev.moviesearch.db.AppDatabase
+import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
 import com.ilyadev.moviesearch.paging.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PagingHomeViewModel @Inject constructor(
@@ -25,11 +31,15 @@ class PagingHomeViewModel @Inject constructor(
     private val _currentCategory = MutableStateFlow("popular")
     val currentCategory: StateFlow<String> = _currentCategory
 
-    // 🔥 Теперь каждый вызов создаёт новый поток
+    // 🔥 Каждый вызов создаёт новый поток → перезапуск при смене категории
     val movies: Flow<PagingData<MovieDto>> get() = createPager().flow.cachedIn(viewModelScope)
+
+    // 🔗 Room
+    private lateinit var movieDao: MovieDao
 
     init {
         setupSharedPreferences()
+        setupRoom()
     }
 
     private fun setupSharedPreferences() {
@@ -40,6 +50,11 @@ class PagingHomeViewModel @Inject constructor(
         _currentCategory.value = savedCategory
     }
 
+    private fun setupRoom() {
+        val database = AppDatabase.getInstance(context)
+        movieDao = database.movieDao()
+    }
+
     private fun createPager(): Pager<Int, MovieDto> {
         return when (_currentCategory.value) {
             "top_rated" -> Pager(config = pagingConfig) { TopRatedPagingSource(apiService) }
@@ -47,6 +62,61 @@ class PagingHomeViewModel @Inject constructor(
             else -> Pager(config = pagingConfig) { MoviesPagingSource(apiService) }
         }
     }
+
+    // ==============================
+    // 📦 Работа с БД (Room)
+    // ==============================
+
+    /**
+     * Сохранить фильм в БД (например, при клике на сердце)
+     */
+    fun insertMovie(movie: MovieDto) {
+        viewModelScope.launch(Dispatchers.IO) {
+            movieDao.insert(movie)
+        }
+    }
+
+    /**
+     * Переключить статус "избранное"
+     */
+    fun toggleFavorite(movie: MovieDto) {
+        viewModelScope.launch(Dispatchers.IO) {
+            movieDao.update(movie.copy(isFavorite = !movie.isFavorite))
+        }
+    }
+
+    /**
+     * Удалить фильм из БД
+     */
+    fun deleteMovie(movie: MovieDto) {
+        viewModelScope.launch(Dispatchers.IO) {
+            movieDao.delete(movie)
+        }
+    }
+
+    /**
+     * Получить все избранные фильмы
+     */
+    fun getFavorites(): Flow<List<MovieDto>> = movieDao.getFavorites()
+
+    /**
+     * Поиск по названию
+     */
+    fun searchMovies(query: String): Flow<List<MovieDto>> = movieDao.searchMovies(query)
+
+    /**
+     * Фильмы с рейтингом выше minRating
+     */
+    fun getMoviesWithMinRating(minRating: Double): Flow<List<MovieDto>> =
+        movieDao.getMoviesWithMinRating(minRating)
+
+    /**
+     * Фильмы по жанру (фильтрация в Kotlin — без UNNEST!)
+     */
+    fun getMoviesByGenre(genreId: Int): Flow<List<MovieDto>> =
+        movieDao.getAllMovies().map { movies ->
+            movies.filter { it.genreIds.contains(genreId) }
+        }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "pref_default_category") {

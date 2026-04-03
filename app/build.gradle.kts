@@ -39,6 +39,7 @@ dependencies {
     // Room — для локальной БД
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-paging:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
     implementation("androidx.preference:preference:1.2.0")
@@ -55,8 +56,9 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Lifecycle
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

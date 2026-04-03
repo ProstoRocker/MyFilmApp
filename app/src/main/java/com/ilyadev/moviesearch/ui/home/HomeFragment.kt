@@ -1,8 +1,6 @@
 package com.ilyadev.moviesearch.ui.home
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MoviePagingAdapter
@@ -22,14 +21,13 @@ import com.ilyadev.moviesearch.di.AppApplication
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: PagingHomeViewModel
     private lateinit var adapter: MoviePagingAdapter
-    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,11 +56,8 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             }
         }
 
-        // Создаём ViewModel через фабрику
+        // Создаём ViewModel
         viewModel = ViewModelProvider(this, factory)[PagingHomeViewModel::class.java]
-
-        // Инициализируем SharedPreferences
-        sharedPrefs = requireContext().getSharedPreferences("app_settings", Context.MODE_PRIVATE)
 
         // Настройка RecyclerView
         binding.recyclerMovies.layoutManager = LinearLayoutManager(requireContext())
@@ -73,16 +68,24 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
         binding.recyclerMovies.adapter = adapter
 
-        // Обработка состояния загрузки
-        adapter.addLoadStateListener { loadState ->
-            val isLoading = loadState is LoadState.Loading
-            val hasNoData = adapter.itemCount == 0 && !isLoading
+        // ==============================
+        // 🔹 Слушаем состояние загрузки (ProgressBar)
+        // ==============================
 
+        // Если вы используете LiveData isLoading
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.emptyText.visibility = if (hasNoData) View.VISIBLE else View.GONE
         }
 
-        // Загрузка данных
+        // Если вы используете errorMessage
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        }
+
+        // ==============================
+        // 🔹 Основная пагинация
+        // ==============================
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movies.collectLatest { pagingData ->
@@ -91,37 +94,45 @@ class HomeFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             }
         }
 
-        // Анимация появления экрана
-        binding.root.post {
-            binding.root.circularReveal(800)
-        }
-    }
+        // ==============================
+        // 🔹 Обработка ошибок пагинации + кэш
+        // ==============================
 
-    override fun onResume() {
-        super.onResume()
-        // Подписываемся на изменения
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this)
-    }
+        adapter.addLoadStateListener { loadState ->
+            when (loadState.refresh) {
+                is LoadState.Loading -> {
+                    // При первом запуске — может быть Loading
+                    binding.progressBar.visibility = View.VISIBLE
+                }
 
-    override fun onPause() {
-        // Отписываемся во избежание утечек
-        sharedPrefs.unregisterOnSharedPreferenceChangeListener(this)
-        super.onPause()
-    }
+                is LoadState.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    val error = loadState.refresh as LoadState.Error
+                    val message = error.error.message ?: "Не удалось загрузить фильмы"
+                    // Показываем SnackBar с ошибкой
+                    Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == "pref_default_category") {
-            // Категория изменилась — перезапустим загрузку
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.currentCategory.collectLatest { category ->
-                        // Перезапускаем пагинацию
-                        viewModel.movies.collectLatest { pagingData ->
-                            adapter.submitData(pagingData)
-                        }
-                    }
+                    // Дополнительно можно обновить состояние в ViewModel
+                    // viewModel.onNetworkError(message)
+                }
+
+                is LoadState.NotLoading -> {
+                    binding.progressBar.visibility = View.GONE
                 }
             }
+
+            // Если есть данные — скрываем emptyText
+            val isLoading = loadState.source.refresh is LoadState.Loading
+            val hasNoData = adapter.itemCount == 0 && !isLoading
+            binding.emptyText.visibility = if (hasNoData) View.VISIBLE else View.GONE
+        }
+
+        // ==============================
+        // 🔹 Анимация появления экрана
+        // ==============================
+
+        binding.root.post {
+            binding.root.circularReveal(800)
         }
     }
 

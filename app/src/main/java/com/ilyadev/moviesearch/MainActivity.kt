@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         // Настройка Toolbar
         setSupportActionBar(binding.toolbar)
 
-        // 🔥 Нижняя навигация — теперь через binding
+        // Нижняя навигация — теперь через binding
         binding.navHome.setOnClickListener {
             replaceFragment(HomeFragment(), R.anim.slide_in_from_right, R.anim.slide_out_to_left)
         }

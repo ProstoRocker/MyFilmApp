@@ -10,7 +10,7 @@ import com.ilyadev.moviesearch.model.MovieDto
 import com.bumptech.glide.Glide
 
 class MoviePagingAdapter(
-    private val onItemClick: (MovieDto) -> Unit  // ← Добавляем параметр
+    private val onItemClick: (MovieDto) -> Unit
 ) : PagingDataAdapter<MovieDto, MoviePagingAdapter.MovieViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -32,7 +32,7 @@ class MoviePagingAdapter(
         fun bind(movie: MovieDto, clickListener: (MovieDto) -> Unit) {
             binding.movieTitle.text = movie.title
             binding.movieYear.text = movie.releaseDate.take(4).ifEmpty { "—" }
-            binding.tvRating.text = movie.rating.toString()
+            binding.tvRating.text = "%.1f".format(movie.voteAverage)
 
             val imageUrl = movie.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" }
             if (imageUrl != null) {

@@ -27,7 +27,7 @@ class MoviesPagingSource(
             LoadResult.Page(
                 data = response.results,
                 prevKey = if (page == 1) null else page - 1,  // Нет предыдущей на первой
-                nextKey = if (page < response.totalPages) page + 1 else null  // Конец пагинации
+                nextKey = if (page < response.total_pages) page + 1 else null  // Конец пагинации
             )
         } catch (e: IOException) {
             LoadResult.Error(e)  // Ошибка сети

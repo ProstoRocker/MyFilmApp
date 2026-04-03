@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="popular"
+        android:entries="@array/category_titles"
+        android:entryValues="@array/category_values"
+        android:key="pref_default_category"
+        android:negativeButtonText="Отмена"
+        android:positiveButtonText="OK"
+        android:summary="%s"
+        android:title="Категория по умолчанию" />
+
+</PreferenceScreen>

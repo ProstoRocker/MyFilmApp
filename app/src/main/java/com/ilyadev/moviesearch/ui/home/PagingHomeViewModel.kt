@@ -99,9 +99,11 @@ class PagingHomeViewModel @Inject constructor(
             "top_rated" -> Pager(config = pagingConfig) {
                 TopRatedPagingSource(apiService, movieDao)
             }
+
             "now_playing" -> Pager(config = pagingConfig) {
                 NowPlayingPagingSource(apiService, movieDao)
             }
+
             else -> Pager(config = pagingConfig) {
                 MoviesPagingSource(apiService, movieDao)
             }

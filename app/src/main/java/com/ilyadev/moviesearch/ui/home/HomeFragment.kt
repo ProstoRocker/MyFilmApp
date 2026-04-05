@@ -53,6 +53,7 @@ class HomeFragment : Fragment() {
                         val apiService = appComponent.provideApiService()
                         PagingHomeViewModel(apiService, requireContext()) as T
                     }
+
                     else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
                 }
             }
@@ -135,14 +136,16 @@ class HomeFragment : Fragment() {
                     val error = (loadState.refresh as LoadState.Error).error
                     viewModel.postErrorMessage(error.message ?: "Ошибка загрузки фильмов")
                 }
+
                 is LoadState.NotLoading -> binding.progressBar.isVisible = false
             }
 
-            val hasNoData = adapter.itemCount == 0 && !loadState.source.refresh.isLoading
+            val hasNoData =
+                adapter.itemCount == 0 && loadState.source.refresh is LoadState.NotLoading
             binding.emptyText.isVisible = hasNoData
         }
 
-        // === Анимация появления ===
+        // === Анимация появления экрана ===
         binding.root.post {
             binding.root.circularReveal(800)
         }

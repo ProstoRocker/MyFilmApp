@@ -4,6 +4,8 @@ import com.ilyadev.moviesearch.model.MovieResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+//Все методы — suspend → работают с корутинами
+
 interface MoviesApiService {
 
     @GET("movie/popular")

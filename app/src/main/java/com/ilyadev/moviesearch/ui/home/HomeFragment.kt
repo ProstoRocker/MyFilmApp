@@ -12,11 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.ilyadev.moviesearch.databinding.FragmentHomeBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.di.AppApplication
+import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.shared.MoviePagingAdapter
 import com.ilyadev.moviesearch.utils.circularReveal
 import kotlinx.coroutines.flow.collectLatest
@@ -121,7 +123,7 @@ class HomeFragment : Fragment() {
         // === Пагинация ===
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.movies.collectLatest { pagingData ->
+                viewModel.movies.collectLatest { pagingData: PagingData<MovieDto> ->
                     adapter.submitData(pagingData)
                 }
             }

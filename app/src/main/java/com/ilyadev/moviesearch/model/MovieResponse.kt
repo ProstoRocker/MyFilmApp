@@ -1,10 +1,12 @@
 package com.ilyadev.moviesearch.model
 
-import com.squareup.moshi.Json
+import com.google.gson.annotations.SerializedName
 
-//Это ответ от API — Moshi автоматически распарсит его в List<MovieDto>
+/**
+ * Ответ от TMDb API для списка фильмов.
+ */
 data class MovieResponse(
-    @Json(name = "results") val results: List<MovieDto>,
-    @Json(name = "total_pages") val total_pages: Int,
-    @Json(name = "page") val page: Int
+    @SerializedName("results") val results: List<MovieDto>,
+    @SerializedName("total_pages") val total_pages: Int,
+    @SerializedName("page") val page: Int
 )

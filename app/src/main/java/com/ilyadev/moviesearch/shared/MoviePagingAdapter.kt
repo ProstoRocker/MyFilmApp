@@ -4,38 +4,43 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.ilyadev.moviesearch.R
-import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
-import com.ilyadev.moviesearch.model.MovieDto
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.ilyadev.moviesearch.R
+import com.ilyadev.moviesearch.databinding.ItemMovieBinding
+import com.ilyadev.moviesearch.model.MovieDto
 
 class MoviePagingAdapter(
-    private val onItemClick: (MovieDto) -> Unit
+    private val onClick: (MovieDto) -> Unit,
+    private val onLongClick: (MovieDto) -> Unit = {}
 ) : PagingDataAdapter<MovieDto, MoviePagingAdapter.MovieViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemMovieVerticalBinding.inflate(inflater, parent, false)
+        val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MovieViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val movie = getItem(position)
-        if (movie != null) {
-            holder.bind(movie, onItemClick)
+        val item = getItem(position)
+        if (item != null) {
+            holder.bind(item, onClick, onLongClick)
         }
     }
 
-    inner class MovieViewHolder(private val binding: ItemMovieVerticalBinding) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+    class MovieViewHolder(private val binding: ItemMovieBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(movie: MovieDto, clickListener: (MovieDto) -> Unit) {
+        fun bind(
+            movie: MovieDto,
+            onClick: (MovieDto) -> Unit,
+            onLongClick: (MovieDto) -> Unit
+        ) {
             binding.movieTitle.text = movie.title
-            binding.movieYear.text = movie.releaseDate.take(4).ifEmpty { "—" }
-            binding.tvRating.text = "%.1f".format(movie.voteAverage)
+            binding.movieYear.text = movie.releaseDate.take(4).ifEmpty { "--" }
+            binding.ratingText.text = "%.1f".format(movie.voteAverage)
 
-            val imageUrl = movie.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" }
-            if (imageUrl != null) {
+            if (movie.posterPath != null) {
+                val imageUrl = "https://image.tmdb.org/t/p/w500${movie.posterPath}"
                 Glide.with(binding.root)
                     .load(imageUrl)
                     .placeholder(R.drawable.ic_placeholder)
@@ -45,17 +50,23 @@ class MoviePagingAdapter(
                 binding.posterImage.setImageResource(R.drawable.ic_placeholder)
             }
 
-            binding.root.setOnClickListener { clickListener(movie) }
+            binding.root.setOnClickListener { onClick(movie) }
+            binding.root.setOnLongClickListener {
+                onLongClick(movie)
+                true
+            }
         }
     }
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<MovieDto>() {
-            override fun areItemsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean =
-                oldItem.id == newItem.id
+            override fun areItemsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-            override fun areContentsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean =
-                oldItem == newItem
+            override fun areContentsTheSame(oldItem: MovieDto, newItem: MovieDto): Boolean {
+                return oldItem == newItem
+            }
         }
     }
 }

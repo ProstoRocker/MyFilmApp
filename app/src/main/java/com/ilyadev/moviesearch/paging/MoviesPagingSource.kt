@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 import java.io.IOException
 
+//Полностью на корутинах, без RxJava, без Callbacks
 class MoviesPagingSource(
     private val apiService: MoviesApiService,
     private val movieDao: MovieDao
@@ -25,8 +26,7 @@ class MoviesPagingSource(
             val response = apiService.getPopularMovies(API_KEY.KEY, page)
 
             // Сохраняем в БД
-            val moviesToInsert = response.results.map { it.copy(isFavorite = false) }
-            movieDao.insertAll(moviesToInsert)
+            movieDao.insertAll(response.results)
 
             LoadResult.Page(
                 data = response.results,
@@ -48,7 +48,7 @@ class MoviesPagingSource(
             if (cached.isNotEmpty()) {
                 LoadResult.Page(data = cached, prevKey = null, nextKey = null)
             } else {
-                LoadResult.Error(Exception("No data in cache and network unavailable"))
+                LoadResult.Error(Exception("No cache and network error"))
             }
         } catch (e: Exception) {
             LoadResult.Error(e)

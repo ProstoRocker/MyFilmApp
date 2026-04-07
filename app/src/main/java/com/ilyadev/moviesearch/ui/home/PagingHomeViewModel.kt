@@ -2,6 +2,7 @@ package com.ilyadev.moviesearch.ui.home
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,8 +15,11 @@ import com.ilyadev.moviesearch.db.AppDatabase
 import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
-import com.ilyadev.moviesearch.paging.*
+import com.ilyadev.moviesearch.paging.MoviesPagingSource
+import com.ilyadev.moviesearch.paging.NowPlayingPagingSource
+import com.ilyadev.moviesearch.paging.TopRatedPagingSource
 import com.ilyadev.moviesearch.utils.CacheManager
+import com.ilyadev.moviesearch.utils.PosterDownloader
 import com.ilyadev.moviesearch.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,12 +41,17 @@ class PagingHomeViewModel @Inject constructor(
     private val _errorMessage = SingleLiveEvent<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
+    // Публичный метод для отправки сообщений об ошибках (например, из HomeFragment)
+    fun postErrorMessage(message: String) {
+        _errorMessage.value = message
+    }
+
     // ====== 🔹 Состояние категории
     private lateinit var sharedPrefs: SharedPreferences
     private val _currentCategory = MutableStateFlow("popular")
     val currentCategory: StateFlow<String> = _currentCategory
 
-    // ====== 🔹 Room + Кэш
+    // ====== 🔹 Room и кэш
     private lateinit var movieDao: MovieDao
     private lateinit var cacheManager: CacheManager
 
@@ -65,37 +74,45 @@ class PagingHomeViewModel @Inject constructor(
 
     private fun setupRoom() {
         val database = AppDatabase.getInstance(context)
-        movieDao = database.movieDao() // Присваиваем
+        movieDao = database.movieDao()
     }
 
     private fun setupCacheManager() {
-        cacheManager = CacheManager(context) // Создаём менеджер кэша
+        cacheManager = CacheManager(context)
     }
 
     private fun createPager(): Pager<Int, MovieDto> {
         return if (cacheManager.isCacheExpired()) {
             // ⏳ Кэш устарел → очищаем БД и грузим из сети
             viewModelScope.launch(Dispatchers.IO) {
-                movieDao.deleteAll() // Очистка
+                movieDao.deleteAll()
             }
             buildNetworkPager()
         } else {
-            // Кэш актуален → грузим из БД
+            // ✅ Кэш актуален → грузим из БД
             buildCachedPager()
         }
     }
 
     private fun buildNetworkPager(): Pager<Int, MovieDto> {
         return when (_currentCategory.value) {
-            "top_rated" -> Pager(config = pagingConfig) { TopRatedPagingSource(apiService, movieDao) }
-            "now_playing" -> Pager(config = pagingConfig) { NowPlayingPagingSource(apiService, movieDao) }
-            else -> Pager(config = pagingConfig) { MoviesPagingSource(apiService, movieDao) }
+            "top_rated" -> Pager(config = pagingConfig) {
+                TopRatedPagingSource(apiService, movieDao)
+            }
+
+            "now_playing" -> Pager(config = pagingConfig) {
+                NowPlayingPagingSource(apiService, movieDao)
+            }
+
+            else -> Pager(config = pagingConfig) {
+                MoviesPagingSource(apiService, movieDao)
+            }
         }
     }
 
     private fun buildCachedPager(): Pager<Int, MovieDto> {
         return Pager(pagingConfig) {
-            movieDao.getAllMoviesAsPagingSource() //  Грузим из кэша
+            movieDao.getAllMoviesAsPagingSource()
         }
     }
 
@@ -132,6 +149,28 @@ class PagingHomeViewModel @Inject constructor(
         movieDao.getAllMovies().map { movies ->
             movies.filter { it.genreIds.contains(genreId) }
         }
+
+    // ==============================
+    // 💾 Загрузка постера в галерею
+    // ==============================
+
+    /**
+     * Асинхронная загрузка постера фильма и сохранение в галерее.
+     *
+     * @param movie Фильм, чей постер нужно сохранить
+     * @return Result<Uri> — URI сохранённого файла или ошибка
+     */
+    suspend fun downloadPosterSuspend(movie: MovieDto): Result<Uri> {
+        return try {
+            PosterDownloader.downloadAndSaveToGallery(
+                context = context,
+                posterUrl = "https://image.tmdb.org/t/p/w500${movie.posterPath}",
+                title = movie.title
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "pref_default_category") {

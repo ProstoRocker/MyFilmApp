@@ -2,17 +2,17 @@ package com.ilyadev.moviesearch.shared
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.ItemMovieBinding
 import com.ilyadev.moviesearch.model.MovieDto
 import com.bumptech.glide.Glide
-import com.ilyadev.moviesearch.R
 
-class MoviePagingAdapter(
+class MovieListAdapter(
     private val onClick: (MovieDto) -> Unit,
     private val onLongClick: (MovieDto) -> Unit = {}
-) : PagingDataAdapter<MovieDto, MoviePagingAdapter.MovieViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<MovieDto, MovieListAdapter.MovieViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,9 +21,7 @@ class MoviePagingAdapter(
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val item = getItem(position)
-        if (item != null) {
-            holder.bind(item, onClick, onLongClick)
-        }
+        holder.bind(item, onClick, onLongClick)
     }
 
     class MovieViewHolder(private val binding: ItemMovieBinding) :

@@ -11,6 +11,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.ilyadev.moviesearch.API_KEY
 import com.ilyadev.moviesearch.db.AppDatabase
 import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
@@ -21,144 +22,72 @@ import com.ilyadev.moviesearch.paging.TopRatedPagingSource
 import com.ilyadev.moviesearch.utils.CacheManager
 import com.ilyadev.moviesearch.utils.PosterDownloader
 import com.ilyadev.moviesearch.utils.SingleLiveEvent
-import kotlinx.coroutines.Dispatchers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel для главного экрана, реализованная на RxJava + Paging 3.
+ *
+ * Отвечает за:
+ * - Загрузку фильмов из сети или кэша (Room)
+ * - Управление состоянием UI: загрузка, ошибка
+ * - Переключение категорий
+ * - Предоставление потока данных для RecyclerView через Paging 3
+ */
 class PagingHomeViewModel @Inject constructor(
     private val apiService: MoviesApiService,
     private val context: Context
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    // ====== 🔹 UI-состояния (LiveData)
+    // ====== 🔹 UI-состояния (для наблюдения в Fragment) ======
+
+    /** Показывает, идёт ли загрузка данных (прогресс-бар) */
     private val _isLoading = MutableLiveData<Boolean>().apply { value = true }
     val isLoading: LiveData<Boolean> = _isLoading
 
+    /** Ошибка, которую нужно показать однократно (Snackbar) */
     private val _errorMessage = SingleLiveEvent<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
-    // Публичный метод для отправки сообщений об ошибках (например, из HomeFragment)
+    /**
+     * Публичный метод для отправки сообщений об ошибках.
+     * Используется при сетевых ошибках, ошибках БД и т.д.
+     */
     fun postErrorMessage(message: String) {
         _errorMessage.value = message
     }
 
-    // ====== 🔹 Состояние категории
-    private lateinit var sharedPrefs: SharedPreferences
-    private val _currentCategory = MutableStateFlow("popular")
-    val currentCategory: StateFlow<String> = _currentCategory
+    // ====== 🔹 Управление категорией ======
 
-    // ====== 🔹 Room и кэш
+    /** Текущая выбранная категория (по умолчанию "popular") */
+    private val _currentCategory = MutableLiveData<String>().apply { value = "popular" }
+    val currentCategory: LiveData<String> = _currentCategory
+
+    // ====== 🔹 Работа с данными ======
+
     private lateinit var movieDao: MovieDao
     private lateinit var cacheManager: CacheManager
 
-    // ====== 🔹 Поток пагинации
-    val movies: Flow<PagingData<MovieDto>> get() = createPager().flow.cachedIn(viewModelScope)
+    // Для управления подписками RxJava
+    private val disposables = CompositeDisposable()
 
     init {
         setupSharedPreferences()
         setupRoom()
         setupCacheManager()
+        loadMovies()
     }
 
-    private fun setupSharedPreferences() {
-        sharedPrefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this)
-
-        val savedCategory = sharedPrefs.getString("pref_default_category", "popular") ?: "popular"
-        _currentCategory.value = savedCategory
-    }
-
-    private fun setupRoom() {
-        val database = AppDatabase.getInstance(context)
-        movieDao = database.movieDao()
-    }
-
-    private fun setupCacheManager() {
-        cacheManager = CacheManager(context)
-    }
-
-    private fun createPager(): Pager<Int, MovieDto> {
-        return if (cacheManager.isCacheExpired()) {
-            // ⏳ Кэш устарел → очищаем БД и грузим из сети
-            viewModelScope.launch(Dispatchers.IO) {
-                movieDao.deleteAll()
-            }
-            buildNetworkPager()
-        } else {
-            // ✅ Кэш актуален → грузим из БД
-            buildCachedPager()
-        }
-    }
-
-    private fun buildNetworkPager(): Pager<Int, MovieDto> {
-        return when (_currentCategory.value) {
-            "top_rated" -> Pager(config = pagingConfig) {
-                TopRatedPagingSource(apiService, movieDao)
-            }
-
-            "now_playing" -> Pager(config = pagingConfig) {
-                NowPlayingPagingSource(apiService, movieDao)
-            }
-
-            else -> Pager(config = pagingConfig) {
-                MoviesPagingSource(apiService, movieDao)
-            }
-        }
-    }
-
-    private fun buildCachedPager(): Pager<Int, MovieDto> {
-        return Pager(pagingConfig) {
-            movieDao.getAllMoviesAsPagingSource()
-        }
-    }
-
-    // ==============================
-    // 📦 Работа с БД (Room)
-    // ==============================
-
-    fun insertMovie(movie: MovieDto) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.insert(movie)
-        }
-    }
-
-    fun toggleFavorite(movie: MovieDto) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.update(movie.copy(isFavorite = !movie.isFavorite))
-        }
-    }
-
-    fun deleteMovie(movie: MovieDto) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.delete(movie)
-        }
-    }
-
-    fun getFavorites(): Flow<List<MovieDto>> = movieDao.getFavorites()
-
-    fun searchMovies(query: String): Flow<List<MovieDto>> = movieDao.searchMovies(query)
-
-    fun getMoviesWithMinRating(minRating: Double): Flow<List<MovieDto>> =
-        movieDao.getMoviesWithMinRating(minRating)
-
-    fun getMoviesByGenre(genreId: Int): Flow<List<MovieDto>> =
-        movieDao.getAllMovies().map { movies ->
-            movies.filter { it.genreIds.contains(genreId) }
-        }
-
-    // ==============================
-    // 💾 Загрузка постера в галерею
-    // ==============================
+    // ====== 🔹 Асинхронные операции: сохранение постера ======
 
     /**
-     * Асинхронная загрузка постера фильма и сохранение в галерее.
+     * Асинхронная загрузка постера фильма и сохранение в галерею.
      *
-     * @param movie Фильм, чей постер нужно сохранить
-     * @return Result<Uri> — URI сохранённого файла или ошибка
+     * Используется при долгом нажатии на карточку фильма.
      */
     suspend fun downloadPosterSuspend(movie: MovieDto): Result<Uri> {
         return try {
@@ -172,19 +101,184 @@ class PagingHomeViewModel @Inject constructor(
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == "pref_default_category") {
-            val newCategory = sharedPreferences?.getString(key, "popular") ?: "popular"
-            _currentCategory.value = newCategory
+    // ====== 🔹 Настройка компонентов ======
+
+    /**
+     * Настройка SharedPreferences для хранения пользовательских настроек.
+     * Например: выбранная категория по умолчанию.
+     */
+    private fun setupSharedPreferences() {
+        val prefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        prefs.registerOnSharedPreferenceChangeListener(this)
+
+        val savedCategory = prefs.getString("pref_default_category", "popular") ?: "popular"
+        _currentCategory.value = savedCategory
+    }
+
+    /**
+     * Инициализация Room Database.
+     * Получаем DAO для работы с таблицей фильмов.
+     */
+    private fun setupRoom() {
+        val database = AppDatabase.getInstance(context)
+        movieDao = database.movieDao()
+    }
+
+    /**
+     * Инициализация менеджера кэширования.
+     * Проверяет, прошло ли более 10 минут с последней загрузки.
+     */
+    private fun setupCacheManager() {
+        cacheManager = CacheManager(context)
+    }
+
+    // ==============================
+    // 📥 Загрузка фильмов (основной метод)
+    // ==============================
+
+    /**
+     * Загружает фильмы:
+     * - Если кэш устарел — очищаем БД и загружаем из сети
+     * - Иначе — показываем данные из локального кэша
+     */
+    fun loadMovies() {
+        _isLoading.value = true
+
+        if (cacheManager.isCacheExpired()) {
+            clearAndLoadFromNetwork()
+        } else {
+            loadFromCache()
         }
     }
 
-    override fun onCleared() {
-        sharedPrefs.unregisterOnSharedPreferenceChangeListener(this)
-        super.onCleared()
+    /**
+     * Очищает БД и загружает данные из сети.
+     */
+    private fun clearAndLoadFromNetwork() {
+        disposables.add(
+            movieDao.deleteAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally { fetchFromNetwork() }
+                .subscribeBy(
+                    onComplete = {},
+                    onError = { e ->
+                        postErrorMessage("Ошибка очистки кэша: ${e.message}")
+                        loadFromCache() // fallback
+                    }
+                )
+        )
+    }
+
+    /**
+     * Выполняет запрос к API в зависимости от текущей категории.
+     * Сохраняет полученные фильмы в БД.
+     */
+    private fun fetchFromNetwork() {
+        val call = when (_currentCategory.value) {
+            "top_rated" -> apiService.getTopRatedMovies(API_KEY.KEY)
+            "now_playing" -> apiService.getNowPlayingMovies(API_KEY.KEY)
+            else -> apiService.getPopularMovies(API_KEY.KEY)
+        }
+
+        disposables.add(
+            call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess { response ->
+                    // Сохраняем в БД (все фильмы — не избранные)
+                    movieDao.insertAll(response.results.map { it.copy(isFavorite = false) })
+                        .subscribeOn(Schedulers.io())
+                        .subscribeBy(
+                            onComplete = {},
+                            onError = { /* игнорируем */ }
+                        )
+                }
+                .subscribeBy(
+                    onSuccess = { response ->
+                        _isLoading.value = false
+                    },
+                    onError = { e ->
+                        postErrorMessage("Ошибка сети: ${e.message}")
+                        loadFromCache() // fallback на кэш
+                    }
+                )
+        )
+    }
+
+    /**
+     * Загружает фильмы из локальной БД (кэш).
+     */
+    private fun loadFromCache() {
+        disposables.add(
+            movieDao.getAllMovies()
+                .firstOrError()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { movies ->
+                        _isLoading.value = false
+                    },
+                    onError = { e ->
+                        postErrorMessage("Кэш пуст или ошибка чтения: ${e.message}")
+                        _isLoading.value = false
+                    }
+                )
+        )
+    }
+
+    // ==============================
+    // 🔹 Поток пагинации (для RecyclerView)
+    // ==============================
+
+    /**
+     * Публичный поток фильмов для отображения в UI через Paging 3.
+     * Подключает Network + Database через соответствующий PagingSource.
+     */
+    val movies: Flow<PagingData<MovieDto>> get() = createPager().flow.cachedIn(viewModelScope)
+
+    private fun createPager(): Pager<Int, MovieDto> {
+        return when (_currentCategory.value) {
+            "top_rated" -> Pager(config = pagingConfig) {
+                TopRatedPagingSource(
+                    apiService,
+                    movieDao
+                )
+            }
+
+            "now_playing" -> Pager(config = pagingConfig) {
+                NowPlayingPagingSource(
+                    apiService,
+                    movieDao
+                )
+            }
+
+            else -> Pager(config = pagingConfig) { MoviesPagingSource(apiService, movieDao) }
+        }
     }
 
     companion object {
         private val pagingConfig = PagingConfig(pageSize = 20, prefetchDistance = 5)
+    }
+
+    // ==============================
+    // 🔁 Обработка изменений в SharedPreferences
+    // ==============================
+
+    override fun onSharedPreferenceChanged(sharedPrefs: SharedPreferences?, key: String?) {
+        if (key == "pref_default_category") {
+            val newCategory = sharedPrefs?.getString(key, "popular") ?: "popular"
+            _currentCategory.value = newCategory
+        }
+    }
+
+    // ==============================
+    // 🧹 Очистка ресурсов
+    // ==============================
+
+    override fun onCleared() {
+        disposables.clear()
+        context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+            .unregisterOnSharedPreferenceChangeListener(this)
+        super.onCleared()
     }
 }

@@ -33,18 +33,21 @@ android {
 
 dependencies {
 
-    // Moshi
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+
+    // RxJava 3
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
 
     // Kotlin Coroutines — Room использует их
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
-    // Room — для локальной БД
-    implementation("androidx.room:room-runtime:2.7.0-alpha11")
-    implementation("androidx.room:room-ktx:2.7.0-alpha11")
-    implementation("androidx.room:room-paging:2.7.0-alpha11")
-    kapt("androidx.room:room-compiler:2.7.0-alpha11")
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-paging:2.6.1")
+    implementation("androidx.room:room-rxjava3:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     implementation("androidx.preference:preference:1.2.0")
 
@@ -68,6 +71,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
 
     // Paging 3
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")

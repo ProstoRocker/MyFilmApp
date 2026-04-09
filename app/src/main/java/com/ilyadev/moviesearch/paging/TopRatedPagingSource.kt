@@ -6,10 +6,16 @@ import com.ilyadev.moviesearch.API_KEY
 import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
-import kotlinx.coroutines.flow.firstOrNull
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.io.IOException
 
+/**
+ * PagingSource для топовых фильмов.
+ *
+ * Аналогично MoviesPagingSource, но использует getTopRatedMovies().
+ */
 class TopRatedPagingSource(
     private val apiService: MoviesApiService,
     private val movieDao: MovieDao
@@ -22,14 +28,20 @@ class TopRatedPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
         return try {
             val page = params.key ?: STARTING_PAGE_INDEX
-            val response = apiService.getTopRatedMovies(API_KEY.KEY, page)
 
-            // Сохраняем в БД
-            val moviesToInsert = response.results.map { it.copy(isFavorite = false) }
-            movieDao.insertAll(moviesToInsert)
+            // Запрос через RxJava
+            val response = runBlocking {
+                apiService.getTopRatedMovies(API_KEY.KEY, page)
+                    .subscribeOn(Schedulers.io())
+                    .blockingGet()  // ← Возвращает MovieResponse
+            }
+
+            val movies = response.results
+
+            movieDao.insertAll(movies.map { it.copy(isFavorite = false) })
 
             LoadResult.Page(
-                data = response.results,
+                data = movies,
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = if (page < response.total_pages) page + 1 else null
             )
@@ -44,11 +56,11 @@ class TopRatedPagingSource(
 
     private suspend fun getCachedData(): LoadResult<Int, MovieDto> {
         return try {
-            val cached = movieDao.getAllMovies().firstOrNull() ?: emptyList()
+            val cached = movieDao.getAllMoviesSync()
             if (cached.isNotEmpty()) {
                 LoadResult.Page(data = cached, prevKey = null, nextKey = null)
             } else {
-                LoadResult.Error(Exception("No data in cache and network unavailable"))
+                LoadResult.Error(Exception("No data in cache"))
             }
         } catch (e: Exception) {
             LoadResult.Error(e)

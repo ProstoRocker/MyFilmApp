@@ -12,7 +12,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ilyadev.moviesearch.API_KEY
-import com.ilyadev.moviesearch.db.AppDatabase
 import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
@@ -40,6 +39,7 @@ import javax.inject.Inject
  */
 class PagingHomeViewModel @Inject constructor(
     private val apiService: MoviesApiService,
+    private val movieDao: MovieDao, // ✅ Теперь внедряется через Dagger
     private val context: Context
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -69,7 +69,6 @@ class PagingHomeViewModel @Inject constructor(
 
     // ====== 🔹 Работа с данными ======
 
-    private lateinit var movieDao: MovieDao
     private lateinit var cacheManager: CacheManager
 
     // Для управления подписками RxJava
@@ -77,7 +76,6 @@ class PagingHomeViewModel @Inject constructor(
 
     init {
         setupSharedPreferences()
-        setupRoom()
         setupCacheManager()
         loadMovies()
     }
@@ -113,15 +111,6 @@ class PagingHomeViewModel @Inject constructor(
 
         val savedCategory = prefs.getString("pref_default_category", "popular") ?: "popular"
         _currentCategory.value = savedCategory
-    }
-
-    /**
-     * Инициализация Room Database.
-     * Получаем DAO для работы с таблицей фильмов.
-     */
-    private fun setupRoom() {
-        val database = AppDatabase.getInstance(context)
-        movieDao = database.movieDao()
     }
 
     /**
@@ -239,15 +228,9 @@ class PagingHomeViewModel @Inject constructor(
     private fun createPager(): Pager<Int, MovieDto> {
         val config = pagingConfig
         return when (_currentCategory.value) {
-            "top_rated" -> Pager(config = config) {
-                TopRatedPagingSource(apiService, movieDao)
-            }
-            "now_playing" -> Pager(config = config) {
-                NowPlayingPagingSource(apiService, movieDao)
-            }
-            else -> Pager(config = config) {
-                MoviesPagingSource(apiService, movieDao)
-            }
+            "top_rated" -> Pager(config = config) { TopRatedPagingSource(apiService, movieDao) }
+            "now_playing" -> Pager(config = config) { NowPlayingPagingSource(apiService, movieDao) }
+            else -> Pager(config = config) { MoviesPagingSource(apiService, movieDao) }
         }
     }
 

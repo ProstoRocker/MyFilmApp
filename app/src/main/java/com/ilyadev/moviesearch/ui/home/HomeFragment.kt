@@ -45,17 +45,19 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // === Создание ViewModel через Dagger 2 ===
+        // === Получаем AppComponent через Application ===
         val appComponent = (requireActivity().application as AppApplication).appComponent
+
+        // === ViewModel Factory: внедряем apiService, movieDao, context ===
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 return when (modelClass) {
                     PagingHomeViewModel::class.java -> {
-                        val apiService = appComponent.provideApiService()
-                        PagingHomeViewModel(apiService, requireContext()) as T
+                        val apiService = appComponent.apiService()
+                        val movieDao = appComponent.movieDao()
+                        PagingHomeViewModel(apiService, movieDao, requireContext()) as T
                     }
-
                     else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
                 }
             }
@@ -120,7 +122,7 @@ class HomeFragment : Fragment() {
             Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
         }
 
-        // === Пагинация ===
+        // === Пагинация: подписка на поток PagingData ===
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.movies.collectLatest { pagingData: PagingData<MovieDto> ->
@@ -138,7 +140,6 @@ class HomeFragment : Fragment() {
                     val error = (loadState.refresh as LoadState.Error).error
                     viewModel.postErrorMessage(error.message ?: "Ошибка загрузки фильмов")
                 }
-
                 is LoadState.NotLoading -> binding.progressBar.isVisible = false
             }
 

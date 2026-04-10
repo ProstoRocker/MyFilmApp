@@ -30,4 +30,20 @@ interface MoviesApiService {
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): Single<MovieResponse>
+
+    /**
+     * Поиск фильма по названию.
+     *
+     * @param query Запрос (например, "Inception")
+     * @param apiKey Ключ API
+     * @param page Номер страницы (пагинация)
+     * @return Ответ с фильмами
+     */
+
+    @GET("search/movie")
+    fun searchMovies(
+        @Query("query") query: String,
+        @Query("api_key") apiKey: String,
+        @Query("page") page: Int = 1
+    ): Single<MovieResponse>
 }

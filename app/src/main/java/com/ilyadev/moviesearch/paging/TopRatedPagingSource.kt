@@ -7,70 +7,35 @@ import com.ilyadev.moviesearch.db.MovieDao
 import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.runBlocking
-import retrofit2.HttpException
-import java.io.IOException
 
-/**
- * PagingSource для топовых фильмов.
- *
- * Аналогично MoviesPagingSource, но использует getTopRatedMovies().
- */
 class TopRatedPagingSource(
     private val apiService: MoviesApiService,
     private val movieDao: MovieDao
 ) : PagingSource<Int, MovieDto>() {
 
-    companion object {
-        const val STARTING_PAGE_INDEX = 1
+    override fun getRefreshKey(state: PagingState<Int, MovieDto>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieDto> {
+        val page = params.key ?: 1
         return try {
-            val page = params.key ?: STARTING_PAGE_INDEX
-
-            // Запрос через RxJava
-            val response = runBlocking {
-                apiService.getTopRatedMovies(API_KEY.KEY, page)
-                    .subscribeOn(Schedulers.io())
-                    .blockingGet()  // ← Возвращает MovieResponse
-            }
-
+            val response = apiService.getTopRatedMovies(API_KEY.KEY, page)
+                .subscribeOn(Schedulers.io())
+                .blockingGet()
+            
             val movies = response.results
-
-            movieDao.insertAll(movies.map { it.copy(isFavorite = false) })
-
+            
             LoadResult.Page(
                 data = movies,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = if (page < response.total_pages) page + 1 else null
+                nextKey = if (movies.isEmpty()) null else page + 1
             )
-        } catch (e: IOException) {
-            getCachedData()
-        } catch (e: HttpException) {
-            getCachedData()
-        } catch (e: Exception) {
-            getCachedData()
-        }
-    }
-
-    private suspend fun getCachedData(): LoadResult<Int, MovieDto> {
-        return try {
-            val cached = movieDao.getAllMoviesSync()
-            if (cached.isNotEmpty()) {
-                LoadResult.Page(data = cached, prevKey = null, nextKey = null)
-            } else {
-                LoadResult.Error(Exception("No data in cache"))
-            }
         } catch (e: Exception) {
             LoadResult.Error(e)
-        }
-    }
-
-    override fun getRefreshKey(state: PagingState<Int, MovieDto>): Int? {
-        return state.anchorPosition?.let { anchor ->
-            state.closestPageToPosition(anchor)?.prevKey?.plus(1)
-                ?: state.closestPageToPosition(anchor)?.nextKey?.minus(1)
         }
     }
 }

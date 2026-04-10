@@ -237,22 +237,17 @@ class PagingHomeViewModel @Inject constructor(
     val movies: Flow<PagingData<MovieDto>> get() = createPager().flow.cachedIn(viewModelScope)
 
     private fun createPager(): Pager<Int, MovieDto> {
+        val config = pagingConfig
         return when (_currentCategory.value) {
-            "top_rated" -> Pager(config = pagingConfig) {
-                TopRatedPagingSource(
-                    apiService,
-                    movieDao
-                )
+            "top_rated" -> Pager(config = config) {
+                TopRatedPagingSource(apiService, movieDao)
             }
-
-            "now_playing" -> Pager(config = pagingConfig) {
-                NowPlayingPagingSource(
-                    apiService,
-                    movieDao
-                )
+            "now_playing" -> Pager(config = config) {
+                NowPlayingPagingSource(apiService, movieDao)
             }
-
-            else -> Pager(config = pagingConfig) { MoviesPagingSource(apiService, movieDao) }
+            else -> Pager(config = config) {
+                MoviesPagingSource(apiService, movieDao)
+            }
         }
     }
 

@@ -29,7 +29,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App"> <!-- ← Основная тема -->
 
-
         <!-- 1. Splash Activity — точка входа -->
         <activity
             android:name=".SplashActivity"
@@ -65,6 +64,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Регистрация ресивера -->
+        <receiver android:name=".receiver.BatteryReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.ACTION_BATTERY_LOW" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

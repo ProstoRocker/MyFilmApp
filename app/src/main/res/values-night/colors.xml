@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Основные цвета -->
+    <color name="primary">#00C853</color>           <!-- Ярко-зелёный (можно оставить как акцент) -->
+    <color name="on_primary">#FFFFFF</color>         <!-- Белый текст на primary -->
+
+    <color name="secondary">#00BCD4</color>          <!-- Голубой (ваш основной цвет) -->
+    <color name="tertiary">#9C27B0</color>           <!-- Фиолетовый -->
+
+    <!-- Цвета текста -->
+    <color name="text_primary">#E0E0E0</color>        <!-- Светлый текст -->
+    <color name="text_secondary">#B0B0B0</color>     <!-- Серый текст -->
+
+    <!-- Фон и поверхности -->
+    <color name="background">#121212</color>         <!-- Тёмный фон приложения -->
+    <color name="surface">#1F1F1F</color>            <!-- Карточки, панели, диалоги -->
+    <color name="on_secondary">#FFFFFF</color>
+
+    <!-- Дополнительные цвета (для Material Components) -->
+    <color name="on_surface">#E0E0E0</color>
+    <color name="on_background">#E0E0E0</color>
+
+    <!-- Альтернативные цвета -->
+    <color name="red_500">#F44336</color>    <!-- Красный -->
+    <color name="green_500">#4CAF50</color>  <!-- Зелёный -->
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

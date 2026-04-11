@@ -3,6 +3,7 @@ package com.ilyadev.moviesearch.di
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.ilyadev.moviesearch.utils.NotificationHelper
 
 class AppApplication : Application() {
 
@@ -11,18 +12,20 @@ class AppApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // ✅ Инициализация темы при старте
+        // Восстановление темы
         val prefs = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
         val isNightEnabled = prefs.getBoolean("night_mode_enabled", false)
-
         AppCompatDelegate.setDefaultNightMode(
             if (isNightEnabled) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
         )
 
-        // Создание Dagger-компонента
+        // Dagger
         appComponent = DaggerAppComponent.builder()
             .context(this)
             .build()
+
+        // Уведомления
+        NotificationHelper.createNotificationChannel(this)
     }
 }

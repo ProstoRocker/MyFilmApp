@@ -4,22 +4,15 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-
-// @Json(name = "...") — автоматически маппит поля из JSON
-// Больше не нужен Converter.fromMap() или fromJson()
-
-/**
- * DTO-объект фильма.
- */
-
 @Entity(tableName = "movies")
 data class MovieDto(
     @PrimaryKey val id: Int,
-    val title: String,
+    @SerializedName("title") val title: String,
     @SerializedName("release_date") val releaseDate: String,
-    @SerializedName("vote_average") val voteAverage: Double,
-    @SerializedName("genre_ids") val genreIds: List<Int>,
+    @SerializedName("overview") val overview: String?,
     @SerializedName("poster_path") val posterPath: String?,
     @SerializedName("backdrop_path") val backdropPath: String?,
-    var isFavorite: Boolean = false
+    @SerializedName("vote_average") val voteAverage: Double,
+    @SerializedName("vote_count") val voteCount: Int,
+    val isFavorite: Boolean = false
 )

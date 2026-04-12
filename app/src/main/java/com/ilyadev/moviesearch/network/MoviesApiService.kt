@@ -1,8 +1,10 @@
 package com.ilyadev.moviesearch.network
 
+import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.model.MovieResponse
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 
@@ -46,4 +48,11 @@ interface MoviesApiService {
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): Single<MovieResponse>
+
+    @GET("movie/{movie_id}")
+    fun getMovieDetails(
+        @Path("movie_id") id: Int,
+        @Query("api_key") apiKey: String
+    ): Single<MovieDto>
+
 }

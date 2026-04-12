@@ -33,6 +33,12 @@ android {
 
 dependencies {
 
+    // Picasso — для загрузки постеров
+    implementation("com.squareup.picasso:picasso:2.8")
+
+    // Обязательно: для поддержки Android 10+ (Scoped Storage) и асинхронной загрузки
+    implementation("androidx.lifecycle:lifecycle-runtime:2.8.5")
+
     // RxJava 3
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")

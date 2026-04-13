@@ -33,6 +33,12 @@ android {
 
 dependencies {
 
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // DataStore для хранения напоминаний (если не используете Room)
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Picasso — для загрузки постеров
     implementation("com.squareup.picasso:picasso:2.8")
 

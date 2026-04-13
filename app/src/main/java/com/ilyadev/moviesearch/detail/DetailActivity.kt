@@ -1,5 +1,6 @@
 package com.ilyadev.moviesearch.detail
 
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -7,12 +8,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.work.*
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.ilyadev.moviesearch.R
+import com.ilyadev.moviesearch.data.model.Reminder
+import com.ilyadev.moviesearch.data.repository.ReminderRepository
 import com.ilyadev.moviesearch.di.AppApplication
 import com.ilyadev.moviesearch.model.MovieDto
+import com.ilyadev.moviesearch.worker.MovieReminderWorker
 import com.squareup.picasso.Picasso
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class DetailActivity : AppCompatActivity() {
 
@@ -104,10 +115,10 @@ class DetailActivity : AppCompatActivity() {
 
     private fun setupButtons(movie: MovieDto) {
         val btnFavorite = findViewById<android.widget.Button>(R.id.btn_favorite)
-        updateFavoriteButton(btnFavorite, movie.id) // ✅ Передаём ID
+        updateFavoriteButton(btnFavorite, movie.id)
 
         btnFavorite.setOnClickListener {
-            if (viewModel.isFavorite(movie.id)) { // ✅ Только ID
+            if (viewModel.isFavorite(movie.id)) {
                 viewModel.removeFromFavorites(movie)
                 Snackbar.make(it, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
             } else {
@@ -125,9 +136,9 @@ class DetailActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(shareIntent, "Поделиться через"))
         }
 
+        // === КНОПКА «ПОСМОТРЕТЬ ПОЗЖЕ» ===
         findViewById<android.widget.Button>(R.id.btn_watch_later).setOnClickListener {
-            viewModel.addWatchLater(movie)
-            Snackbar.make(it, "Добавлено в «Посмотреть позже»", Snackbar.LENGTH_SHORT).show()
+            showTimePickerDialog(movie)
         }
     }
 
@@ -139,6 +150,83 @@ class DetailActivity : AppCompatActivity() {
             button.text = "В избранное"
             button.setBackgroundColor(ContextCompat.getColor(this, R.color.green_500))
         }
+    }
+
+    /**
+     * Показывает диалог выбора времени.
+     */
+    private fun showTimePickerDialog(movie: MovieDto) {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+        }
+
+        TimePickerDialog(
+            this,
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
+                val selectedTimeMillis = calendar.timeInMillis
+
+                if (selectedTimeMillis <= System.currentTimeMillis()) {
+                    Toast.makeText(this, "Выберите будущее время", Toast.LENGTH_SHORT).show()
+                    return@TimePickerDialog
+                }
+
+                scheduleReminder(movie, selectedTimeMillis)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
+        ).also { dialog ->
+            dialog.setTitle("Когда напомнить?")
+            dialog.show()
+        }
+    }
+
+    /**
+     * Запланировать уведомление через WorkManager.
+     */
+    private fun scheduleReminder(movie: MovieDto, reminderTimeMillis: Long) {
+        val workName = "reminder_${movie.id}"
+        val initialDelay = reminderTimeMillis - System.currentTimeMillis()
+
+        if (initialDelay <= 0) {
+            Toast.makeText(this, "Выберите будущее время", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val data = Data.Builder()
+            .putInt("movie_id", movie.id)
+            .putString("movie_title", movie.title)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<MovieReminderWorker>()
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .setInputData(data)
+            .addTag(workName)
+            .build()
+
+        lifecycleScope.launch {
+            ReminderRepository.addReminder(
+                applicationContext, Reminder(
+                    id = Random.nextInt(),
+                    movieId = movie.id,
+                    movieTitle = movie.title,
+                    reminderTimeMillis = reminderTimeMillis
+                )
+            )
+        }
+
+        WorkManager.getInstance(applicationContext)
+            .enqueueUniqueWork(workName, ExistingWorkPolicy.REPLACE, workRequest)
+
+        val formattedTime =
+            SimpleDateFormat("dd.MM HH:mm", Locale.getDefault()).format(Date(reminderTimeMillis))
+        Toast.makeText(this, "✅ Напоминание установлено на $formattedTime", Toast.LENGTH_LONG)
+            .show()
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -25,8 +25,8 @@ object NotificationHelper {
                 description = "Уведомления о фильмах, которые нужно посмотреть"
             }
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(channel)
         }
     }
 
@@ -53,7 +53,7 @@ object NotificationHelper {
             .setAutoCancel(true)
             .build()
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID_BASE + movieId, notification)
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.notify(NOTIFICATION_ID_BASE + movieId, notification)
     }
 }

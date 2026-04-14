@@ -16,6 +16,34 @@ android {
         versionName = "1.0"
     }
 
+    // productFlavors
+    flavorDimensions.add("version")
+    productFlavors {
+        create("free") {
+            dimension = "version"
+            applicationIdSuffix = ".free"
+            versionNameSuffix = "-free"
+        }
+        create("paid") {
+            dimension = "version"
+            applicationIdSuffix = ".paid"
+            versionNameSuffix = "-paid"
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -28,6 +56,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -44,6 +73,8 @@ dependencies {
 
     // Обязательно: для поддержки Android 10+ (Scoped Storage) и асинхронной загрузки
     implementation("androidx.lifecycle:lifecycle-runtime:2.8.5")
+    // Нужно для ProcessLifecycleOwner.
+    implementation("androidx.lifecycle:lifecycle-process:2.8.5")
 
     // RxJava 3
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")

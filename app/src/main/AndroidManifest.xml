@@ -2,10 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Разрешение на интернет -->
+    <!-- 🔹 РАЗРЕШЕНИЯ -->
+
+    <!-- Интернет — необходим для запросов к TMDB API -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Для Android 9 и ниже — запись во внешнее хранилище -->
+    <!-- Запись во внешнее хранилище (до Android 9) -->
+    <!-- maxSdkVersion="28" — автоматически отключается на Android 10+ -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -13,11 +16,14 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
-    <!-- Для Android 10+ (Scoped Storage) — управление медиафайлами -->
+    <!-- Для Android 10+ (Scoped Storage): управление медиафайлами -->
+    <!-- Используется при сохранении постеров в галерею -->
+    <!-- tools:ignore="ScopedStorageSecurity" — подавляет предупреждение Lint -->
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorageSecurity" />
 
+    <!-- 🏗️ КОРНЕВОЙ ЭЛЕМЕНТ ПРИЛОЖЕНИЯ -->
     <application
         android:name=".di.AppApplication"
         android:allowBackup="true"
@@ -29,32 +35,47 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App"> <!-- ← Основная тема -->
 
-        <!-- 1. Splash Activity — точка входа -->
+        <!-- 1. SplashActivity — точка входа в приложение -->
+        <!-- Отображается первым, содержит анимацию запуска -->
         <activity
             android:name=".SplashActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/SplashTheme">              <!-- Стиль без действия (NoActionBar) -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- 2. MainActivity — основной экран -->
+        <!-- 2. MainActivity — основной экран с нижней навигацией -->
+        <!-- Не экспортирован → не доступен из других приложений -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
 
-        <!-- 3. DetailActivity -->
+        <!-- 3. DetailActivity — показывает полную информацию о фильме -->
+        <!-- Переход через Intent.putExtra("movie_id", id) -->
         <activity
             android:name=".detail.DetailActivity"
             android:exported="false" />
 
-        <!-- 4. SettingsActivity -->
+        <!-- 4. SettingsActivity — экран настроек -->
+        <!-- Например: тема, категория по умолчанию -->
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
 
-        <!-- FileProvider для безопасного доступа к файлам (обязательно!) -->
+        <!-- 5. OnboardingActivity — экран приветствия при первом запуске -->
+        <!-- Показывает промо-изображение из Firebase Remote Config -->
+        <!-- После показа перенаправляет в MainActivity -->
+        <activity
+            android:name=".ui.onboarding.OnboardingActivity"
+            android:exported="false" />
+
+        <!-- 🔐 FileProvider — безопасный доступ к файлам -->
+        <!-- Требуется для сохранения изображений в галерею -->
+        <!-- ${applicationId}.fileprovider — уникальный authority -->
+        <!-- @xml/file_paths — определяет, какие директории разрешены -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -65,8 +86,17 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Регистрация ресивера -->
-        <receiver android:name=".receiver.BatteryReceiver" android:exported="false">
+        <!-- 🔋 BatteryReceiver — ловит системные события -->
+        <!-- Отслеживает:
+             - Низкий заряд (ACTION_BATTERY_LOW)
+             - Подключение зарядки (ACTION_POWER_CONNECTED)
+             - Отключение зарядки (ACTION_POWER_DISCONNECTED)
+             -->
+        <!-- Переключает ночную тему при низком заряде -->
+        <!-- exported="false" — только внутри приложения -->
+        <receiver
+            android:name=".receiver.BatteryReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />

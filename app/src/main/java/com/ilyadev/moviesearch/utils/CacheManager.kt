@@ -9,6 +9,10 @@ import java.util.concurrent.TimeUnit
  * Менеджер кэширования для управления временем последней загрузки данных.
  * Используется для определения, нужно ли обновлять данные из сети или можно использовать локальный кэш (Room).
  *
+ * Логика:
+ * - Если с последней загрузки прошло >10 минут → считаем кэш устаревшим
+ * - Иначе — используем локальные данные
+ *
  * @param context Контекст приложения (для доступа к SharedPreferences)
  */
 class CacheManager(private val context: Context) {
@@ -27,10 +31,12 @@ class CacheManager(private val context: Context) {
     }
 
     /**
+     * Обновляет временную метку.
      * Устанавливает текущее время как метку последней загрузки.
      * Вызывается после успешного получения данных из сети.
      *
      * @param time Время в миллисекундах (по умолчанию — текущее время)
+     * Вызывается после успешной загрузки из API.
      */
     fun setLastUpdatedTime(time: Long = System.currentTimeMillis()) {
         sharedPrefs.edit {
@@ -56,6 +62,7 @@ class CacheManager(private val context: Context) {
     /**
      * Принудительно очищает метку времени (для тестирования или ручного обновления).
      * После вызова `isCacheExpired()` вернёт `true`.
+     * Полезно для тестирования.
      */
     fun clearCache() {
         sharedPrefs.edit {

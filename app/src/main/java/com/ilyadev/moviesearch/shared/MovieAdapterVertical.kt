@@ -10,6 +10,17 @@ import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.databinding.ItemMovieVerticalBinding
 import com.ilyadev.moviesearch.model.Movie
 
+/**
+ * Адаптер для отображения фильмов в вертикальной карточке (например, в демо).
+ *
+ * Использует:
+ * - ListAdapter + DiffUtil — эффективное обновление списка
+ * - Встроенную анимацию: прогресс-рейтинга, появления
+ * - Callback onClick для реакции на клик
+ *
+ * ❌ Не используется в основных экранах.
+ * ✅ Только для статичного UI / моковых данных.
+ */
 class MovieAdapterVertical(
     private val onItemClick: (Movie) -> Unit
 ) : ListAdapter<Movie, MovieAdapterVertical.MovieViewHolder>(MovieDiffCallback()) {
@@ -27,31 +38,14 @@ class MovieAdapterVertical(
         val movie = getItem(position)
 
         holder.binding.apply {
-            // --- 1. Загрузка данных ---
             posterImage.setImageResource(movie.posterResId)
             movieTitle.text = movie.title
             movieYear.text = movie.year
             movieDescription.text = movie.description
 
-            // --- 2. Установка рейтинга ---
             tvRating.text = movie.rating.toString()
 
-            // 🔥 Здесь — обработка клика по всей карточке
-            root.setOnClickListener {
-                onItemClick(movie)  // ← Вызывает переданный callback
-            }
-
-            // Сброс прогресса
-            progressBar.progress = 0
-            progressBar.alpha = 0f
-
-            // Анимация появления
-            progressBar.animate()
-                .alpha(1f)
-                .setDuration(400)
-                .start()
-
-            // Анимация заполнения
+            // Анимация заполнения рейтинга
             android.animation.ValueAnimator.ofInt(0, (movie.rating * 10).toInt()).apply {
                 duration = 800
                 addUpdateListener { animator ->
@@ -60,20 +54,18 @@ class MovieAdapterVertical(
                 start()
             }
 
-            // --- 3. Анимация появления карточки ---
+            // Анимация появления карточки
             root.startAnimation(
                 AnimationUtils.loadAnimation(root.context, R.anim.slide_in_from_bottom)
             )
 
-            // --- 4. Клик по карточке ---
-            root.setOnClickListener {
-                onItemClick(movie)
-            }
+            // Клик
+            root.setOnClickListener { onItemClick(movie) }
         }
     }
 }
 
-// DiffUtil Callback
+// === DiffUtil ===
 class MovieDiffCallback : DiffUtil.ItemCallback<Movie>() {
     override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean =
         oldItem.id == newItem.id

@@ -25,6 +25,21 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+/**
+ * Главный экран приложения.
+ *
+ * Отвечает за:
+ * - Отображение списка фильмов (popular, top_rated, now_playing)
+ * - Управление категориями
+ * - Пагинацию
+ * - Анимацию появления
+ *
+ * Использует:
+ * - Paging 3 + RxJava
+ * - Dagger для внедрения зависимостей
+ * - Circular reveal animation
+ */
+
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -58,6 +73,7 @@ class HomeFragment : Fragment() {
                         val movieDao = appComponent.movieDao()
                         PagingHomeViewModel(apiService, movieDao, requireContext()) as T
                     }
+
                     else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
                 }
             }
@@ -140,6 +156,7 @@ class HomeFragment : Fragment() {
                     val error = (loadState.refresh as LoadState.Error).error
                     viewModel.postErrorMessage(error.message ?: "Ошибка загрузки фильмов")
                 }
+
                 is LoadState.NotLoading -> binding.progressBar.isVisible = false
             }
 

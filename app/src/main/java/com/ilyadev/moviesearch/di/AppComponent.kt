@@ -10,7 +10,10 @@ import javax.inject.Singleton
 /**
  * Главный компонент Dagger 2.
  *
- * Отвечает за внедрение зависимостей во всём приложении.
+ * Собирает зависимости из NetworkModule и DatabaseModule.
+ * Обеспечивает единый экземпляр сервисов во всём приложении.
+ *
+ * @Singleton — гарантирует, что объект создаётся только один раз
  */
 @Singleton
 @Component(
@@ -28,10 +31,9 @@ interface AppComponent {
         fun build(): AppComponent
     }
 
-    // Экспорт зависимостей для внедрения в ViewModel
+    // Экспорт зависимостей для внедрения в другие классы
     fun apiService(): MoviesApiService
     fun movieDao(): MovieDao
 
-    // Можно добавить инжекторы, если нужно
-    // fun inject(viewModel: PagingHomeViewModel)
+    // Можно добавить: fun inject(viewModel: PagingHomeViewModel)
 }

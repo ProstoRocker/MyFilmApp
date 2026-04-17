@@ -8,6 +8,13 @@ import com.ilyadev.moviesearch.model.MovieDto
 import com.ilyadev.moviesearch.network.MoviesApiService
 import io.reactivex.rxjava3.schedulers.Schedulers
 
+/**
+ * Источник пагинации для фильмов с высоким рейтингом.
+ *
+ * Загружает данные с /movie/top_rated
+ *
+ * Аналогичен другим PagingSource, но для другой категории.
+ */
 class TopRatedPagingSource(
     private val apiService: MoviesApiService,
     private val movieDao: MovieDao
@@ -26,9 +33,9 @@ class TopRatedPagingSource(
             val response = apiService.getTopRatedMovies(API_KEY.KEY, page)
                 .subscribeOn(Schedulers.io())
                 .blockingGet()
-            
+
             val movies = response.results
-            
+
             LoadResult.Page(
                 data = movies,
                 prevKey = if (page == 1) null else page - 1,

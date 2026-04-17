@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.ilyadev.moviesearch.free" />
+                  <option name="mobileSdkAppId" value="1:140938897611:android:258889b2b571dc3580534e" />
+                  <option name="projectId" value="device-streaming-4f572dc2" />
+                  <option name="projectNumber" value="140938897611" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

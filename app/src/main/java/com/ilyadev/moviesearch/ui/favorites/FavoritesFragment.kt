@@ -12,6 +12,16 @@ import com.ilyadev.moviesearch.databinding.FragmentFavoritesBinding
 import com.ilyadev.moviesearch.detail.DetailActivity
 import com.ilyadev.moviesearch.shared.MovieAdapterVertical
 
+/**
+ * Экран "Избранное".
+ *
+ * Показывает фильмы, добавленные пользователем.
+ * Использует мок-репозиторий MovieRepository.
+ *
+ * В продакшене:
+ * - Данные берутся из Room
+ * - Состояние isFavorite хранится в БД
+ */
 class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
@@ -22,7 +32,6 @@ class FavoritesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Создаём binding
         _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -30,18 +39,15 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Создаём адаптер
         val adapter = MovieAdapterVertical { movie ->
             val intent = Intent(requireContext(), DetailActivity::class.java)
             intent.putExtra("movie_id", movie.id)
             startActivity(intent)
         }
 
-        // Получаем избранные фильмы
         val favorites = MovieRepository.favorites
         adapter.submitList(favorites)
 
-        // Настраиваем RecyclerView
         binding.recyclerFavorites.apply {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = adapter
@@ -50,7 +56,6 @@ class FavoritesFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Очищаем ссылку
         _binding = null
     }
 }

@@ -9,6 +9,18 @@ import com.ilyadev.moviesearch.model.MovieDto
 import com.bumptech.glide.Glide
 import com.ilyadev.moviesearch.R
 
+/**
+ * Основной адаптер приложения.
+ *
+ * Используется в HomeFragment, SearchFragment.
+ *
+ * Особенности:
+ * - Наследуется от PagingDataAdapter → работает с PagingData
+ * - Автоматически подгружает следующие страницы при прокрутке
+ * - Эффективно обновляет UI через DiffUtil
+ *
+ * Это лучший выбор для бесконечных списков.
+ */
 class MoviePagingAdapter(
     private val onClick: (MovieDto) -> Unit,
     private val onLongClick: (MovieDto) -> Unit = {}

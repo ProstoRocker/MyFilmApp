@@ -9,6 +9,18 @@ import com.ilyadev.moviesearch.databinding.ItemMovieBinding
 import com.ilyadev.moviesearch.model.MovieDto
 import com.bumptech.glide.Glide
 
+/**
+ * Стандартный адаптер для списка фильмов.
+ *
+ * Отличается от PagingDataAdapter тем, что:
+ * - Работает с обычным List<MovieDto>
+ * - Используется в избранном, подборках и т.п.
+ *
+ * Поддерживает:
+ * - Клик и долгий клик
+ * - Загрузку постера через Glide
+ * - Форматирование даты и рейтинга
+ */
 class MovieListAdapter(
     private val onClick: (MovieDto) -> Unit,
     private val onLongClick: (MovieDto) -> Unit = {}

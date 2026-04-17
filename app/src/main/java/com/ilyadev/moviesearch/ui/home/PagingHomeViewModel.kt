@@ -36,10 +36,19 @@ import javax.inject.Inject
  * - Управление состоянием UI: загрузка, ошибка
  * - Переключение категорий
  * - Предоставление потока данных для RecyclerView через Paging 3
+ * - Внедряет зависимости через @Inject
+ * - Использует CacheManager для управления обновлениями
+ * - Поддерживает SharedPreferences (например, дефолтная категория)
+ * - Предоставляет Flow<PagingData<MovieDto>> для RecyclerView
+ *
+ * Архитектура:
+ * - RxJava для очистки БД
+ * - Coroutines + Paging 3 для UI
+ * - CompositeDisposable для подписок
  */
 class PagingHomeViewModel @Inject constructor(
     private val apiService: MoviesApiService,
-    private val movieDao: MovieDao, // ✅ Теперь внедряется через Dagger
+    private val movieDao: MovieDao, // Теперь внедряется через Dagger
     private val context: Context
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -58,7 +67,7 @@ class PagingHomeViewModel @Inject constructor(
      * Используется при сетевых ошибках, ошибках БД и т.д.
      */
     fun postErrorMessage(message: String) {
-        _errorMessage.value = message
+        _errorMessage.postValue(message)
     }
 
     // ====== 🔹 Управление категорией ======

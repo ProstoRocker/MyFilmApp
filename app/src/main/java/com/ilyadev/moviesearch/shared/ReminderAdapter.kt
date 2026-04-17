@@ -10,6 +10,16 @@ import com.ilyadev.moviesearch.databinding.ItemReminderBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Адаптер для списка напоминаний ("Посмотреть позже").
+ *
+ * Отображает:
+ * - Название фильма
+ * - Время напоминания
+ * - Кнопки: Редактировать / Отменить
+ *
+ * Использует ListAdapter + DiffUtil для эффективного обновления.
+ */
 class ReminderAdapter(
     private val onEdit: (Reminder) -> Unit,
     private val onCancel: (Reminder) -> Unit

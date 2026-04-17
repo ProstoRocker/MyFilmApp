@@ -17,10 +17,10 @@ object PosterDownloader {
     /**
      * Асинхронно загружает постер и сохраняет в галерею.
      *
-     * @param context Контекст Activity
-     * @param posterUrl Полный URL постера
+     * @param context Activity
+     * @param posterUrl URL постера
      * @param title Название фильма (для имени файла)
-     * @return Result<Uri> — URI сохранённого файла или ошибка
+     * @return Result<Uri> — URI сохранённого файла
      */
     suspend fun downloadAndSaveToGallery(
         context: Context,
@@ -40,7 +40,7 @@ object PosterDownloader {
 
             FileOutputStream(file).use { it.write(bytes) }
 
-            // Возвращаем URI
+            // Получаем безопасный URI
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",

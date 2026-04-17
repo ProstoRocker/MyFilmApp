@@ -7,6 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ilyadev.moviesearch.databinding.FragmentSettingsBinding
 
+/**
+ * Альтернативный экран настроек — кастомный.
+ *
+ * Отличается от PreferenceFragment:
+ * - Полный контроль над UI
+ * - Можно использовать Material Design 3 компоненты
+ * - Гибкая логика
+ * - Подходит для простых настроек
+ *
+ * Используется как пример того, как можно делать без XML-настроек.
+ */
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null

@@ -9,11 +9,15 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-
 /**
- * Теперь Retrofit знает, как работать с Single, Observable и другими типами RxJava
+ * Модуль Dagger для сетевых компонентов.
+ *
+ * Отвечает за:
+ * - Создание Retrofit с baseUrl
+ * - Добавление адаптера для RxJava 3
+ * - Добавление конвертера JSON (Gson)
+ * - Управление HTTP-клиентом (OkHttp)
  */
-
 @Module
 class NetworkModule {
 
@@ -25,8 +29,8 @@ class NetworkModule {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create()) // или Moshi, но с адаптером
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create()) // JSON ↔ объекты
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create()) // Поддержка Single, Observable
             .build()
     }
 

@@ -4,6 +4,13 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import androidx.core.view.isVisible
 
+/**
+ * Расширяющий метод для View.
+ *
+ * Добавляет красивую анимацию появления — круговая раскрывающаяся анимация.
+ *
+ * Используется во всех фрагментах.
+ */
 fun View.circularReveal(
     duration: Long = 600,
     startRadius: Float = 0f,
@@ -15,14 +22,8 @@ fun View.circularReveal(
     val anim = ViewAnimationUtils.createCircularReveal(this, cx, cy, startRadius, endRadius)
     anim.duration = duration
 
-    // Скрываем до анимации
     isVisible = false
-
-    // Запускаем анимацию
     anim.start()
 
-    // Через duration показываем view (без слушателя — безопасно)
-    postDelayed({
-        isVisible = true
-    }, duration)
+    postDelayed({ isVisible = true }, duration)
 }

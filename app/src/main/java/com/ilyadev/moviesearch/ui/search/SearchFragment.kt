@@ -20,6 +20,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+/**
+ * Экран поиска.
+ *
+ * Поддерживает:
+ * - Live search (с debounce 300ms)
+ * - Бесконечную прокрутку (Paging 3)
+ * - Анимацию появления
+ *
+ * Поиск — реактивный: при каждом изменении текста создаётся новый поток.
+ */
+
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
@@ -76,7 +87,7 @@ class SearchFragment : Fragment() {
         }
 
         // === Обработка состояний ===
-        binding.recyclerResults.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        binding.recyclerResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager as? LinearLayoutManager

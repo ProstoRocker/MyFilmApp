@@ -25,6 +25,20 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
+/**
+ * Экран подробной информации о фильме.
+ *
+ * Отвечает за:
+ * - Загрузку данных фильма по ID из Intent
+ * - Отображение названия, постера, описания
+ * - Управление состоянием: "В избранное", "Поделиться", "Посмотреть позже"
+ * - Планирование напоминаний через WorkManager
+ *
+ * Использует:
+ * - ViewModel + LiveData для реактивного UI
+ * - Picasso — для загрузки постера
+ * - TimePickerDialog — выбор времени напоминания
+ */
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var viewModel: DetailViewModel
@@ -41,6 +55,7 @@ class DetailActivity : AppCompatActivity() {
         bindViews()
         initViewModel()
 
+        // Получаем ID фильма из Intent
         val movieId = intent.getIntExtra("movie_id", -1)
         if (movieId == -1) {
             Toast.makeText(this, "Ошибка: неверный ID фильма", Toast.LENGTH_SHORT).show()
@@ -51,11 +66,17 @@ class DetailActivity : AppCompatActivity() {
         loadMovie(movieId)
     }
 
+    /**
+     * Настраивает Toolbar как ActionBar.
+     */
     private fun setupToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Кнопка "назад"
     }
 
+    /**
+     * Привязывает View-элементы к переменным.
+     */
     private fun bindViews() {
         backdropImage = findViewById(R.id.iv_backdrop)
         titleText = findViewById(R.id.tv_title)
@@ -63,6 +84,9 @@ class DetailActivity : AppCompatActivity() {
         descriptionText = findViewById(R.id.tv_description)
     }
 
+    /**
+     * Создаёт ViewModel и начинает слушать данные.
+     */
     private fun initViewModel() {
         val appComponent = (application as AppApplication).appComponent
         val apiService = appComponent.apiService()
@@ -70,10 +94,16 @@ class DetailActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    /**
+     * Запускает загрузку фильма по ID.
+     */
     private fun loadMovie(id: Int) {
         viewModel.loadMovie(id)
     }
 
+    /**
+     * Подписывается на изменения в ViewModel.
+     */
     private fun observeViewModel() {
         viewModel.movie.observe(this) { movie ->
             if (movie != null) {
@@ -84,7 +114,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.isLoading.observe(this) { /* можно показать прогресс */ }
+        viewModel.isLoading.observe(this) { /* можно показать ProgressBar */ }
 
         viewModel.error.observe(this) { error ->
             if (error != null) {
@@ -94,6 +124,9 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Отображает информацию о фильме.
+     */
     private fun showMovie(movie: MovieDto) {
         findViewById<CollapsingToolbarLayout>(R.id.collapsing_toolbar).title = movie.title
 
@@ -113,6 +146,9 @@ class DetailActivity : AppCompatActivity() {
         setupButtons(movie)
     }
 
+    /**
+     * Настраивает кнопки: Избранное, Поделиться, Посмотреть позже.
+     */
     private fun setupButtons(movie: MovieDto) {
         val btnFavorite = findViewById<android.widget.Button>(R.id.btn_favorite)
         updateFavoriteButton(btnFavorite, movie.id)
@@ -142,6 +178,9 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Обновляет внешний вид кнопки "В избранное".
+     */
     private fun updateFavoriteButton(button: android.widget.Button, movieId: Int) {
         if (viewModel.isFavorite(movieId)) {
             button.text = "Удалить из избранного"
@@ -153,7 +192,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     /**
-     * Показывает диалог выбора времени.
+     * Показывает диалог выбора времени для напоминания.
      */
     private fun showTimePickerDialog(movie: MovieDto) {
         val calendar = Calendar.getInstance().apply {
@@ -229,6 +268,9 @@ class DetailActivity : AppCompatActivity() {
             .show()
     }
 
+    /**
+     * Переход назад по системной кнопке "Назад".
+     */
     override fun onSupportNavigateUp(): Boolean {
         onBackPressedDispatcher.onBackPressed()
         return true

@@ -12,18 +12,39 @@ import com.ilyadev.moviesearch.data.model.Reminder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Репозиторий для управления напоминаниями.
+ *
+ * Использует DataStore (преференсы) вместо SharedPreferences — современный, безопасный и асинхронный подход.
+ *
+ * Структура хранения:
+ *   reminder_<movieId>_id → Int
+ *   reminder_<movieId>_title → String
+ *   reminder_<movieId>_time → Long
+ *   reminder_<movieId>_scheduled → Int (0/1)
+ *
+ * Методы:
+ * - addReminder() — сохраняет новое напоминание
+ * - getAllRemindersFlow() — возвращает Flow<List<Reminder>> для реактивного UI
+ * - removeReminder() — удаляет запись
+ * - markAsDelivered() — помечает как доставленное (для отключения дублей)
+ */
 object ReminderRepository {
     private const val REMINDER_PREFIX = "reminder_"
 
+    // Extension property для удобства
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "reminders_prefs")
 
-    // Ключи для хранения
+    // Генерация ключей по movieId
     private fun idKey(movieId: Int) = intPreferencesKey("${REMINDER_PREFIX}${movieId}_id")
     private fun titleKey(movieId: Int) = stringPreferencesKey("${REMINDER_PREFIX}${movieId}_title")
     private fun timeKey(movieId: Int) = longPreferencesKey("${REMINDER_PREFIX}${movieId}_time")
     private fun scheduledKey(movieId: Int) =
         intPreferencesKey("${REMINDER_PREFIX}${movieId}_scheduled")
 
+    /**
+     * Сохраняет напоминание в DataStore.
+     */
     suspend fun addReminder(context: Context, reminder: Reminder) {
         context.dataStore.edit { prefs ->
             prefs[idKey(reminder.movieId)] = reminder.id
@@ -33,6 +54,10 @@ object ReminderRepository {
         }
     }
 
+    /**
+     * Возвращает поток всех активных напоминаний.
+     * Используется в WatchLaterFragment для отображения списка.
+     */
     fun getAllRemindersFlow(context: Context): Flow<List<Reminder>> {
         return context.dataStore.data.map { prefs ->
             prefs.asMap().keys
@@ -54,6 +79,9 @@ object ReminderRepository {
         }
     }
 
+    /**
+     * Удаляет напоминание по movieId.
+     */
     suspend fun removeReminder(context: Context, movieId: Int) {
         context.dataStore.edit { prefs ->
             prefs.remove(idKey(movieId))
@@ -63,6 +91,9 @@ object ReminderRepository {
         }
     }
 
+    /**
+     * Помечает напоминание как доставленное (например, после показа уведомления).
+     */
     suspend fun markAsDelivered(context: Context, movieId: Int) {
         context.dataStore.edit { prefs ->
             prefs[scheduledKey(movieId)] = 0

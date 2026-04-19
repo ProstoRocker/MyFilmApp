@@ -30,6 +30,20 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
+/**
+ * Экран "Посмотреть позже".
+ *
+ * Показывает все запланированные напоминания.
+ *
+ * Возможности:
+ * - Редактирование времени
+ * - Отмена уведомления
+ * - Переустановка через WorkManager
+ *
+ * Использует:
+ * - DataStore + Flow → реактивное обновление списка
+ * - circularReveal → анимация появления
+ */
 class WatchLaterFragment : Fragment() {
 
     private var _binding: FragmentWatchLaterBinding? = null
@@ -57,7 +71,7 @@ class WatchLaterFragment : Fragment() {
         binding.recyclerReminders.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerReminders.adapter = adapter
 
-        // Подписка на изменения
+        // Реактивная подписка на список напоминаний
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 ReminderRepository.getAllRemindersFlow(requireContext())
@@ -74,11 +88,21 @@ class WatchLaterFragment : Fragment() {
             }
         }
 
+        // Анимация появления
         binding.root.post {
             binding.root.circularReveal(800)
         }
     }
 
+    /**
+     * Редактирует время напоминания.
+     *
+     * Логика:
+     * 1. Отменяет старую задачу в WorkManager
+     * 2. Удаляет старую запись из DataStore
+     * 3. Создаёт новую с новым временем
+     * 4. Запускает новую задачу
+     */
     private fun editReminder(reminder: Reminder) {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = reminder.reminderTimeMillis
@@ -100,16 +124,15 @@ class WatchLaterFragment : Fragment() {
                     return@TimePickerDialog
                 }
 
-                // 🚀 Перепланировать напоминание
                 lifecycleScope.launch {
-                    // 1. Отменяем старую задачу
+                    // 1. Отмена старой задачи
                     WorkManager.getInstance(requireContext())
                         .cancelUniqueWork("reminder_${reminder.movieId}")
 
-                    // 2. Удаляем старую запись из DataStore
+                    // 2. Удаление из хранилища
                     ReminderRepository.removeReminder(requireContext(), reminder.movieId)
 
-                    // 3. Создаём новую запись с новым временем
+                    // 3. Создание нового напоминания
                     val newReminder = Reminder(
                         id = Random.nextInt(),
                         movieId = reminder.movieId,
@@ -117,9 +140,10 @@ class WatchLaterFragment : Fragment() {
                         reminderTimeMillis = newTimeMillis,
                         isScheduled = true
                     )
+
                     ReminderRepository.addReminder(requireContext(), newReminder)
 
-                    // 4. Запускаем новую задачу
+                    // 4. Перезапуск WorkManager
                     val data = Data.Builder()
                         .putInt("movie_id", reminder.movieId)
                         .putString("movie_title", reminder.movieTitle)
@@ -162,6 +186,9 @@ class WatchLaterFragment : Fragment() {
         return sdf.format(Date(millis))
     }
 
+    /**
+     * Отменяет напоминание.
+     */
     private fun cancelReminder(reminder: Reminder) {
         context?.let { ctx ->
             androidx.work.WorkManager.getInstance(ctx)

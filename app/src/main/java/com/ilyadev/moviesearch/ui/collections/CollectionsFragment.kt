@@ -3,13 +3,21 @@ package com.ilyadev.moviesearch.ui.collections
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ilyadev.moviesearch.databinding.FragmentCollectionsBinding
 import com.ilyadev.moviesearch.utils.circularReveal
-import kotlin.math.hypot
 
+/**
+ * Экран "Подборки" — демонстрационный.
+ *
+ * Сейчас показывает только заголовок с анимацией.
+ * В будущем можно добавить:
+ * - Категории: "По жанрам", "По рейтингу", "Классика"
+ * - Карусель фильмов
+ *
+ * Использует circularReveal для плавного появления.
+ */
 class CollectionsFragment : Fragment() {
 
     private var _binding: FragmentCollectionsBinding? = null
@@ -31,26 +39,9 @@ class CollectionsFragment : Fragment() {
         binding.tvTitle.text = "Подборки"
 
         if (!isRevealed) {
-            view.post {
-                binding.root.circularReveal(800)
-            }
+            view.post { binding.root.circularReveal(800) }
             isRevealed = true
         }
-    }
-
-    private fun createCircularReveal(view: View) {
-        val cx = view.width / 2
-        val cy = view.height / 2
-        val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
-
-        val anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0f, finalRadius)
-        anim.duration = 800
-
-        view.alpha = 0f
-        view.visibility = View.VISIBLE
-
-        anim.start()
-        view.animate().alpha(1f).setDuration(600).start()
     }
 
     override fun onDestroyView() {

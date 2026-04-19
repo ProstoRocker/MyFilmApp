@@ -6,6 +6,22 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Устаревший клиент.
+ *
+ * ❌ Не используется в проекте.
+ *
+ * Оставлен для примера.
+ *
+ * Современный подход:
+ * - Создание Retrofit через Dagger (в NetworkModule)
+ * - А не как объект-синглтон
+ *
+ * Причины:
+ * - Проблемы с DI
+ * - Сложно тестировать
+ * - Gson создаётся заново при каждом lazy-get
+ */
 object RetrofitClient {
     private const val BASE_URL = "https://api.themoviedb.org/3/"
 

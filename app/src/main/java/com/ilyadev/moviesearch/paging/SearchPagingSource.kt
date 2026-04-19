@@ -12,9 +12,14 @@ import retrofit2.HttpException
 import java.io.IOException
 
 /**
- * PagingSource для поиска фильмов по названию.
+ * Источник пагинации для поиска фильмов.
  *
- * Используется в SearchViewModel для пагинации результатов поиска.
+ * Поддерживает:
+ * - Поиск по подстроке
+ * - Постраничную загрузку
+ * - Обработку ошибок сети и API
+ *
+ * Используется в SearchViewModel.
  */
 class SearchPagingSource(
     private val apiService: MoviesApiService,
@@ -36,11 +41,11 @@ class SearchPagingSource(
         return try {
             val page = params.key ?: STARTING_PAGE_INDEX
 
-            // Вызов RxJava из suspend через withContext(Dispatchers.IO)
+            // Безопасный вызов RxJava из suspend
             val response = withContext(Dispatchers.IO) {
                 apiService.searchMovies(query, API_KEY.KEY, page)
                     .subscribeOn(Schedulers.io())
-                    .blockingGet()  // Возвращает MovieResponse
+                    .blockingGet()
             }
 
             LoadResult.Page(

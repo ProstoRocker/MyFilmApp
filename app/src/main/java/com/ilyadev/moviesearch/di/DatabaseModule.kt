@@ -9,7 +9,14 @@ import dagger.Provides
 import javax.inject.Singleton
 
 /**
- * Модуль Dagger 2 для предоставления компонентов базы данных.
+ * Модуль Dagger для предоставления компонентов Room.
+ *
+ * Отвечает за:
+ * - Создание экземпляра AppDatabase
+ * - Предоставление DAO
+ *
+ * @Provides — сообщает Dagger, как создать объект
+ * @Singleton — гарантирует один экземпляр
  */
 @Module
 class DatabaseModule {
@@ -20,7 +27,7 @@ class DatabaseModule {
     @Singleton
     fun provideAppDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration() // Пересоздаёт БД при изменении схемы (для разработки)
             .build()
     }
 

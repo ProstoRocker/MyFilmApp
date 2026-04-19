@@ -3,10 +3,25 @@ package com.ilyadev.moviesearch.data.repository
 import com.ilyadev.moviesearch.R
 import com.ilyadev.moviesearch.model.Movie
 
+/**
+ * Мок-репозиторий для фильмов (в реальном проекте заменяется на Room + Retrofit).
+ *
+ * Отвечает за:
+ * - Получение списка фильмов (из мока)
+ * - Управление избранным (добавление/удаление)
+ * - Поиск фильма по ID
+ *
+ * ⚠️ В продакшене:
+ *   - getAllMovies() → Paging 3 + Room
+ *   - addToFavorites() → Room.insert()
+ *   - isFavorite() → Room.query()
+ *
+ * Здесь используется простой `MutableList` для демонстрации логики.
+ */
 object MovieRepository {
     private val mockMovies = createMockMovies()
     private val _favorites = mutableListOf<Movie>()
-    val favorites get() = _favorites.toList() // неизменяемая копия
+    val favorites get() = _favorites.toList() // возвращает неизменяемую копию
 
     fun getAllMovies(): List<Movie> = mockMovies
 

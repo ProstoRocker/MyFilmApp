@@ -6,6 +6,10 @@ import com.ilyadev.moviesearch.data.repository.MovieRepository
 import com.ilyadev.moviesearch.model.Movie
 import kotlinx.coroutines.launch
 
+// Это устаревший VM, не используется в HomeFragment
+// Оставлен как пример ручной реализации
+// Не используется. Текущий — PagingHomeViewModel.
+
 class HomeViewModel : ViewModel() {
 
     private var _onMoviesLoaded: ((List<Movie>) -> Unit)? = null

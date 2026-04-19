@@ -23,6 +23,14 @@ object MovieRepository {
     private val _favorites = mutableListOf<Movie>()
     val favorites get() = _favorites.toList() // возвращает неизменяемую копию
 
+    /**
+     * Сбрасывает состояние репозитория для тестирования.
+     * Используется только в unit-тестах.
+     */
+    fun resetForTesting() {
+        _favorites.clear()
+    }
+
     fun getAllMovies(): List<Movie> = mockMovies
 
     fun addToFavorites(movie: Movie) {
